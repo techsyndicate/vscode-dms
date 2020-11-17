@@ -20,6 +20,7 @@ export const authenticate = () => {
     }
 
     console.log(token)
+    await Util.context.globalState.update(accessTokenKey, token);
 
     res.end(`
     <!doctype html>

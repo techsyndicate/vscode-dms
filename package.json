@@ -10,23 +10,20 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*"
+		"onView:dm-full"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"menus": {
 			"view/title": [
 				{
-					"command": "vscode-dms.startMessaging",
-					"when": "view == vscode-dms"
+					"command": "vscode-dms.refresh",
+					"when": "view == dm-full",
+					"group": "navigation"
 				}
 			]
 		},
 		"commands": [
-			{
-				"command": "vscode-dms.helloWorld",
-				"title": "Hello World"
-			},
 			{
 				"command": "vscode-dms.startMessaging",
 				"title": "Start Messaging"
@@ -43,20 +40,15 @@
 		},
 		"views": {
 			"vscode-dms": [
-				{
-					"id": "vscode-dms",
+				{	
+					"type": "webview",
+					"id": "dm-full",
 					"name": "Direct Messages",
 					"icon": "media/inbox.svg",
 					"contextualTitle": "Direct Messages"
 				}
 			]
-		},
-		"viewsWelcome": [
-			{
-				"view": "vscode-dms",
-				"contents": "Welcome to Direct Messages for Visual Studio Code [learn more](https://github.com/techsyndicate/vscode-dms).\n[Start Messaging](command:vscode-dms.startMessaging)"
-			}
-		]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",

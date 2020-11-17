@@ -1,39 +1,67 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { authenticate } from "./authenticate"
-import { accessTokenKey } from './constants';
+import { DMSidebarProvider } from "./DMSidebarProvider";
 import { Util } from "./util"
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+
 export function activate(context: vscode.ExtensionContext) {
+	Util.context = context;
+	console.log('yoz! vscode-dms is active.');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-dms" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('vscode-dms.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from vscode-dms!');
-	});
+	const provider = new DMSidebarProvider(context.extensionUri);
+	context.subscriptions.push(
+	  vscode.window.registerWebviewViewProvider("dm-full", provider)
+	);
 
 	vscode.commands.registerCommand('vscode-dms.startMessaging', async () => {
-		const choice = await vscode.window.showInformationMessage(
-			`You need to login to GitHub to start messaging, would you like to continue?`,
-			"Yes",
-			"Cancel"
-		  );
-		if (choice === "Yes") {
-			authenticate()
+		if(!Util.isLoggedIn()) {
+			const choice = await vscode.window.showInformationMessage(
+				`You need to login to GitHub to start messaging, would you like to continue?`,
+				"Yes",
+				"Cancel"
+			);
+			if (choice === "Yes") {
+				authenticate()
+			}
+			return;
 		}
-		console.log(Util.getAccessToken())
-		return;
-	});
 
-	context.subscriptions.push(disposable);
+		const userData = {
+			username: 'laxyapahuja',
+			img: 'https://github.com/laxyapahuja.png',
+			access_token: '',
+			conversations: {
+			'oorjitchowdhary': 1218931928312983123,
+			'sheldor1510': 290310293812983012380
+		  }
+		}
+
+		const panel = vscode.window.createWebviewPanel(
+			userData.username,
+			'User Info',
+			vscode.ViewColumn.One,
+			{}
+		  );
+	
+		// And set its HTML content
+		panel.webview.html = getWebviewContent();
+		function getWebviewContent() {
+			return `<!DOCTYPE html>
+		  <html lang="en">
+		  <head>
+			  <meta charset="UTF-8">
+			  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+			  <title>User Info</title>
+		  </head>
+		  <body>
+		  <br>
+			  <img src="${userData.img}" width="300" />
+			<br>
+			<h1>${userData.username}</h1>
+		  </body>
+		  </html>`;
+		  }
+	});
 }
 
-// this method is called when your extension is deactivated
+
 export function deactivate() {}
