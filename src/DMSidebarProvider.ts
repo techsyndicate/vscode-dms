@@ -59,6 +59,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
         <link href="${styleMainUri}" rel="stylesheet">
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
+            const accessToken = "${Util.getAccessToken()}"
             const tsvscode = acquireVsCodeApi();
         </script>
 			</head>
