@@ -10,6 +10,7 @@
       try {
         const res = await axios.get(`${apiBaseUrl}/api/users/contacts?access_token=${accessToken}`);
         users = res.data;
+        const socket = io.connect("https://vscdms.herokuapp.com")
       } catch (err) {
         error = err.message
       }

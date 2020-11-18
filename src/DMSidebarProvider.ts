@@ -57,6 +57,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
         <link href="${styleResetUri}" rel="stylesheet">
 				<link href="${styleVSCodeUri}" rel="stylesheet">
         <link href="${styleMainUri}" rel="stylesheet">
+        <script nonce="${nonce}" src="https://vscdms.herokuapp.com/socket.io/socket.io.js"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const accessToken = "${Util.getAccessToken()}"
