@@ -8,7 +8,7 @@
     
     const fetchData = async () => { 
       try {
-        const res = await axios.get(`${apiBaseUrl}/api/users/contacts?access_token=63e69d313a3a066cb0abcab9d8652d37cd94cb6d`);
+        const res = await axios.get(`${apiBaseUrl}/api/users/contacts?access_token=${accessToken}`);
         users = res.data;
       } catch (err) {
         error = err.message
