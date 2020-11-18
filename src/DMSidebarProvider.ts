@@ -2,7 +2,10 @@ import * as vscode from "vscode";
 import { apiBaseUrl } from "./constants";
 import { getNonce } from "./getNonce";
 import { Util } from './util'
-import axios from 'axios'
+import { ViewDMPanel } from "./ViewDMPanel";
+
+let user:string = '';
+let fileName:string = 'sidebar';
 
 export class DMSidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
@@ -24,6 +27,25 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
     };
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+
+    webviewView.webview.onDidReceiveMessage(async (data) => {
+      switch (data.type) {
+        case "onContactPress": {
+          if (!data.value) {
+            return;
+          }
+          ViewDMPanel.createOrShow(this._extensionUri, data.value)
+          break;
+        }
+        case "onError": {
+          if (!data.value) {
+            return;
+          }
+          vscode.window.showErrorMessage(data.value);
+          break;
+        }
+      }
+    });
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
@@ -31,10 +53,10 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._extensionUri, "media", "reset.css")
     );
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.js")
+      vscode.Uri.joinPath(this._extensionUri, "out", `compiled/${fileName}.js`)
     );
     const styleMainUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.css")
+      vscode.Uri.joinPath(this._extensionUri, "out", `compiled/${fileName}.css`)
     );
     const styleVSCodeUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "media", "vscode.css")
@@ -60,6 +82,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const accessToken = "${Util.getAccessToken()}"
+            const user = "${user}"
             const tsvscode = acquireVsCodeApi();
         </script>
 			</head>

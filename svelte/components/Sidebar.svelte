@@ -54,7 +54,9 @@
   {/if}
     <h2>Contacts ({users.length})</h2><br>
     {#each users as user}
-    <div class="contact-card">
+    <div class="contact-card" on:click={() => {
+      tsvscode.postMessage({ type: 'onContactPress', value: user });
+    }}>
       <div class="inline">
         <img class="contact-img" src="{user.avatar_url}" alt="{user.username}"/>
         <h3 class="contact-name">{user.username}</h3>
