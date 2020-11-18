@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import { apiBaseUrl } from "./constants";
 import { getNonce } from "./getNonce";
+import { Util } from './util'
+import axios from 'axios'
 
 export class DMSidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
@@ -25,6 +27,19 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
+    const styleResetUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "media", "reset.css")
+    );
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.js")
+    );
+    const styleMainUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.css")
+    );
+    const styleVSCodeUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "media", "vscode.css")
+    );
+
     const nonce = getNonce();
 
     return `<!DOCTYPE html>
@@ -38,15 +53,22 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
         <meta http-equiv="Content-Security-Policy" content="default-src ${apiBaseUrl}; img-src https: data:; style-src ${
       webview.cspSource
     }; script-src 'nonce-${nonce}';">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="${styleResetUri}" rel="stylesheet">
+				<link href="${styleVSCodeUri}" rel="stylesheet">
+        <link href="${styleMainUri}" rel="stylesheet">
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();
         </script>
 			</head>
       <body>
-      <h1>Direct Messages for Anshul saha</h1>
-        </body>
-        </html>`;
+      <!--
+        <div class="dm-grid">
+        </div>
+      -->
+      <script nonce="${nonce}" src="${scriptUri}"></script>
+      </body>
+      </html>`;
   }
 }
