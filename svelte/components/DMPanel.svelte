@@ -21,6 +21,7 @@
       await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${accessToken}&socket_id=${socket.id}`
       );
     });
+    socket.emit("status", "online")
   };
 
   const getStatus = async() => {

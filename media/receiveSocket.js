@@ -1,6 +1,7 @@
 function initSocket() {
     console.log('socket initialized')
     const messagesArea = document.getElementById('messages-area')
+    const Status = document.getElementById('dm-status')
 
     function dateToString(date) {
         return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
@@ -12,7 +13,17 @@ function initSocket() {
     }
 
     socket.on("receive-message", msg => {
-        messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
-        window.scrollTo(0, document.body.scrollHeight);
+        if (msg.sender == username) {
+            messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
+            window.scrollTo(0, document.body.scrollHeight);
+        } else {
+            console.log('blocked message')
+        }
     });
+
+    socket.on("status", status => {
+        if (status.user == username) {
+            Status.innerHTML = status.status
+        }
+    })
 }
