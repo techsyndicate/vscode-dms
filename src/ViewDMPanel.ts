@@ -158,7 +158,8 @@ export class ViewDMPanel {
 			</head>
       <body>
 			</body>
-				<script nonce="${nonce}" src="${scriptUri}"></script>
+        <script nonce="${nonce}" src="${scriptUri}"></script>
+        <script nonce="${nonce}" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 			</html>`;
   }
 }

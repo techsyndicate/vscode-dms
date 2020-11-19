@@ -99,11 +99,13 @@
 	},
 	"dependencies": {
 		"@types/jest": "^26.0.15",
+		"@types/jquery": "^3.5.4",
 		"@types/node-fetch": "^2.5.7",
 		"@types/polka": "^0.5.1",
 		"@types/socket.io-client": "^1.4.34",
 		"axios": "^0.21.0",
 		"jest": "^26.6.3",
+		"jquery": "^3.5.1",
 		"node-fetch": "^2.6.1",
 		"polka": "^0.5.2",
 		"socket.io-client": "^3.0.2"
