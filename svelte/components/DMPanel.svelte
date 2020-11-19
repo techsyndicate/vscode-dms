@@ -64,7 +64,7 @@ import { get } from "svelte/store";
 
   function messageInflator(message) {
         date = dateToString(message.date)
-        return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div style="max-width: 300px"><h4 class="msg-content">${message.message}</h4></div></div><br>`;
+        return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><h4 class="msg-content">${message.message}</h4></div></div><br>`;
     }
 
 </script>
@@ -73,7 +73,7 @@ import { get } from "svelte/store";
   <div class="navbar">
     <div class="navbar-inline">
       <img src={imageUrl} alt={username} class="dm-img" />
-      <h3 class="dm-name">{username}</h3>
+      <a class="name-hyperlink" style="text-decoration: none;color: white;" href="https://github.com/{username}"><h3 class="dm-name">{username}</h3></a>
     </div>
     <h4 class="dm-status">{status}</h4>
   </div>
@@ -95,7 +95,7 @@ import { get } from "svelte/store";
               class="date">{dateToString(new Date(message.date))}</span>
           </h3>
         </div>
-        <div style="max-width: 300px">
+        <div class="msg-container">
           <h4 class="msg-content">{message.message}</h4>
         </div>
       </div><br />

@@ -45,13 +45,14 @@
 
 .input-box {
     height: 60px;
-    width: 100%;
+    width: 103%;
     background-color: #3c3c3c;
     margin-left: -5%;
     margin-right: -5%;
     overflow: hidden;
     position: fixed;
     padding-left: 5%;
+    padding-right: 5%;
     bottom: 0;
 }
 
@@ -60,8 +61,13 @@
     width: inherit;
     filter: brightness(120%);
     margin-top: 10px;
-    padding-left: 10px;
+    padding-left: 50px;
     font-size: 1.2rem;
+}
+
+#message-input {
+    padding-left: 20px;
+    width: 103%;
 }
 
 .message-input:focus {
@@ -69,7 +75,8 @@
 }
 
 .messages-area {
-    padding-top: 5%;
+    padding-top: 60px;
+    padding-bottom: 70px;
 }
 
 .message-inline {
@@ -89,4 +96,9 @@
     margin-top: -15px;
     font-size: 1rem;
     padding-left: 50px;
+    overflow-wrap: break-word;
+}
+
+.name-hyperlink:focus {
+    outline: none;
 }
