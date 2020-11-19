@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { append, text } from "svelte/internal";
   import { onMount } from "svelte";
   import axios from "axios";
-import { get } from "svelte/store";
 
   let error = null;
   let status = ""
@@ -56,6 +54,8 @@ import { get } from "svelte/store";
     status = await getStatus()
     finalMessages = await getMessages();
     initSocket();
+    console.log(document.body)
+    window.scrollTo(0, document.body.scrollHeight);
   });
 
   function dateToString(date) {
@@ -117,12 +117,16 @@ import { get } from "svelte/store";
           const messagesArea = document.getElementById('messages-area');
           messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(message);
           document.sendMessage.reset()
+          window.scrollTo(0,document.body.scrollHeight);
         }}>
         <input
           class="message-input"
           id="message-input"
           placeholder="Message"
-          value="" />
+          value=""
+          on:click={()=> {
+            window.scrollTo(0,document.body.scrollHeight);
+          }}/>
       </form>
     </div>
   </div>
