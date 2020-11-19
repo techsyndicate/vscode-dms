@@ -1,6 +1,6 @@
 {
 	"name": "vscode-dms",
-	"displayName": "vscode-dms",
+	"displayName": "VSCode DMs",
 	"description": "Direct Messages for Visual Studio Code",
 	"version": "0.0.1",
 	"engines": {
@@ -17,16 +17,26 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "vscode-dms.refresh",
+					"command": "vscode-dms.info",
 					"when": "view == dm-full",
 					"group": "navigation"
+				}
+			],
+			"editor/context": [
+				{
+					"command": "vscode-dms.sendMessage"
 				}
 			]
 		},
 		"commands": [
 			{
-				"command": "vscode-dms.startMessaging",
-				"title": "Start Messaging"
+				"command": "vscode-dms.sendMessage",
+				"title": "Send Message"
+			},
+			{
+				"command": "vscode-dms.info",
+				"title": "Information",
+				"icon": "media/white-info.svg"
 			}
 		],
 		"viewsContainers": {
@@ -104,6 +114,7 @@
 		"@types/polka": "^0.5.1",
 		"@types/socket.io-client": "^1.4.34",
 		"axios": "^0.21.0",
+		"fs": "0.0.1-security",
 		"jest": "^26.6.3",
 		"jquery": "^3.5.1",
 		"node-fetch": "^2.6.1",
