@@ -55,21 +55,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('vscode-dms.sendMessage', async () => {
 		const editor = vscode.window.activeTextEditor;
 		const selection = editor && editor.selection;
-		console.log(selection)
-		let windowTitle = '';
-		if(editor) {
-			const activeFileName = editor.document.uri.path.slice(1, editor.document.uri.path.length)
-			windowTitle = `${vscode.workspace.name} - ${activeFileName}`;
-			console.log(activeFileName)
-			console.log(windowTitle)
-			fs.readFile(activeFileName, (err, data) => {
-				console.log(data)
-				if(err) {
-					console.log(err)
-				}
-			})
-		}
-		
+		var text = editor?.document.getText(selection)
+		// text is the code that is selected
+		console.log(text)
 	} )
 
 	const provider = new DMSidebarProvider(context.extensionUri);
