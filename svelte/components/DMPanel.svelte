@@ -1,6 +1,42 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+    import axios from 'axios';
+
     let error = null;
     let finalMessages = [];
+    let socketId = ""
+    let date = new Date()
+    let message = {
+        access_token: accessToken,
+        sender: '',
+        receiver: username,
+        date: date,
+        type: 'text',
+        message: '',
+        conversation_id: ''
+    }
+
+    const socket = io.connect(`${apiBaseUrl}`);
+    const sendSocketId = async() => {
+        socket.on("connect", async (data) => {
+        await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${accessToken}&socket_id=${socket.id}`)
+    });
+    }
+
+    const getSenderUsername = async() => {
+        const res = await axios.get(`${apiBaseUrl}/api/users?access_token=${accessToken}`);
+        message.sender = res.data.username;
+    }
+
+    onMount(async () => {
+      await getSenderUsername()
+      await sendSocketId()
+      if (message.sender < message.receiver) {
+        message.conversation_id = `${message.sender}${message.receiver}`;
+        } else {
+        message.conversation_id = `${message.receiver}${message.sender}`;
+        }
+    });
 
     const newMessage = {
         date: '2020-11-26 at 6:41 PM',
@@ -75,6 +111,11 @@
         message: 'example should be the last one',
         conversation_id: 'laxyapahujasheldor1510'
         })
+
+    function sendMessage() {
+
+    }
+
 </script>
 
 <style>
@@ -187,7 +228,30 @@
 </div>
 <div class="input-box">
     <div class="input-inline">
-        <input class="message-input" placeholder="Message">
+        <form action="" on:submit={() => {
+            let messageInput = document.getElementById('message-input').value
+            message.message = messageInput
+            let date = new Date();
+            message.date = date
+            console.log('message: ' + message.message)
+            console.log('message: ' + message.sender)
+            console.log('message: ' + message.receiver)
+            console.log('message: ' + message.conversation_id)
+            console.log('message: ' + message.date)
+            console.log('message: ' + message.type)
+            console.log('message: ' + message.access_token)
+            socket.emit('send-message', message.toString());
+            }}>
+            <input class="message-input" id="message-input" placeholder="Message" value="">
+        </form>
     </div>
 </div>
+
+<script>
+        socket.on('receive-message', msg => {
+            msg = msg.json()
+            console.log(msg)
+            newIntoExisting(msg)
+        })
+</script>
 </main>

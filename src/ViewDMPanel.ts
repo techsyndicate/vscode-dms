@@ -146,6 +146,7 @@ export class ViewDMPanel {
                 <link href="${stylesResetUri}" rel="stylesheet">
 				<link href="${stylesMainUri}" rel="stylesheet">
                 <link href="${cssUri}" rel="stylesheet">
+                <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();
