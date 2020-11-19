@@ -22,6 +22,7 @@ function initSocket() {
     });
 
     socket.on("status", status => {
+        console.log(status)
         if (status.user == username) {
             Status.innerHTML = status.status
         }
