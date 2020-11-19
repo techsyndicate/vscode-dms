@@ -1,0 +1,92 @@
+.navbar {
+    height: 60px;
+    width: 150%;
+    background-color: #3c3c3c;
+    margin-left: -5%;
+    margin-right: -5%;
+    margin-top: -1%;
+    overflow: hidden;
+    position: fixed;
+    padding-left: 5%;
+}
+
+.dm-img {
+    height: 35px;
+    width: 35px;
+    margin-top: 7px;
+    border-radius: 50%;
+}
+
+.dm-name {
+    margin-left: 15px;
+    margin-top: -10px;
+    font-weight: bold;
+}
+
+.date {
+    color: grey;
+    margin-left: 10px;
+    font-weight: normal;
+    font-size: 1rem
+}
+
+.navbar-inline {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    margin-top: 0.5%;
+}
+
+.dm-status {
+    margin-top: -15px;
+    font-size: 1rem;
+    padding-left: 50px;
+}
+
+.input-box {
+    height: 60px;
+    width: 100%;
+    background-color: #3c3c3c;
+    margin-left: -5%;
+    margin-right: -5%;
+    overflow: hidden;
+    position: fixed;
+    padding-left: 5%;
+    bottom: 0;
+}
+
+.message-input {
+    height: 40px;
+    width: inherit;
+    filter: brightness(120%);
+    margin-top: 10px;
+    padding-left: 10px;
+    font-size: 1.2rem;
+}
+
+.message-input:focus {
+    outline: none;
+}
+
+.messages-area {
+    padding-top: 5%;
+}
+
+.message-inline {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
+
+.msg-img {
+    height: 35px;
+    width: 35px;
+    margin-top: 15px;
+    border-radius: 50%;
+}
+
+.msg-content {
+    margin-top: -15px;
+    font-size: 1rem;
+    padding-left: 50px;
+}

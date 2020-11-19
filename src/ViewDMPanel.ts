@@ -106,6 +106,10 @@ export class ViewDMPanel {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "out", "compiled/dmpanel.js")
     );
+
+    const receiveSocketUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "media", "receiveSocket.js")
+    )
     
     // Local path to css styles
     const styleResetPath = vscode.Uri.joinPath(
@@ -119,10 +123,17 @@ export class ViewDMPanel {
         "media",
         "vscode.css"
     );
+
+    const stylesDMPanelPath = vscode.Uri.joinPath(
+      this._extensionUri,
+      "media",
+      "dmpanel.css"
+  );
     
     // Uri to load styles into webview
     const stylesResetUri = webview.asWebviewUri(styleResetPath);
     const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
+    const styleDMPanelUri = webview.asWebviewUri(stylesDMPanelPath);
     const cssUri = webview.asWebviewUri(
     vscode.Uri.joinPath(this._extensionUri, "out", "compiled/dmpanel.css")
     );
@@ -142,24 +153,28 @@ export class ViewDMPanel {
         <meta http-equiv="Content-Security-Policy" content="default-src ${apiBaseUrl}; img-src https: data:; style-src ${
       webview.cspSource
     }; script-src 'nonce-${nonce}';">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link href="${stylesResetUri}" rel="stylesheet">
-				<link href="${stylesMainUri}" rel="stylesheet">
-                <link href="${cssUri}" rel="stylesheet">
-                <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="${stylesResetUri}" rel="stylesheet">
+        <link href="${stylesMainUri}" rel="stylesheet">
+        <link href="${styleDMPanelUri}" rel="stylesheet">
+        <link href="${cssUri}" rel="stylesheet">
+        <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
+        <script nonce="${nonce}" src="${receiveSocketUri}"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();
             const accessToken = "${Util.getAccessToken()}"
             const username = "${this._user.username}"
             const imageUrl = "${this._user.avatar_url}"
+            const nonce = "${nonce}"
+            const socket = io.connect(apiBaseUrl);
         </script>
             <title>${this._user.username}</title>
 			</head>
       <body>
-			</body>
-        <script nonce="${nonce}" src="${scriptUri}"></script>
-        <script nonce="${nonce}" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+      </body>
+      <script nonce="${nonce}" src="${scriptUri}"></script>
+      <script nonce="${nonce}" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 			</html>`;
   }
 }
