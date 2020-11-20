@@ -34,7 +34,7 @@ export const authenticate = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
       </head>
       <body>
-          <h1>Authentication successfull! you can now close this tab</h1>
+          <h1>Authentication successful! you can now close this tab</h1>
           <style>
             html, body {
               background-color: black;
@@ -52,5 +52,27 @@ export const authenticate = () => {
     `);
 
     (app as any).server.close();
+
+    const panel = vscode.window.createWebviewPanel(
+      'authSuccessful',
+      'Auth Successful',
+      vscode.ViewColumn.One,
+      {}
+      );
+    panel.webview.html = getWebviewContent();
+
+    function getWebviewContent() {
+      return `<!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body>
+      <h1>Authorization successful!</h1>
+      <h2>You now need to reopen VSCode inorder to start messaging!</h2>
+      </body>
+      </html>`;
+    }
   });
 };
