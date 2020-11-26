@@ -178,7 +178,7 @@ export class ViewDMPanel {
 					Use a content security policy to only allow loading images from https or from our extension directory,
 					and only allow scripts that have a specific nonce.
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src ${apiBaseUrl} https://*.googleapis.com; img-src https: blob: data:; style-src ${webview.cspSource
+        <meta http-equiv="Content-Security-Policy" content="default-src * ${apiBaseUrl} https://*.googleapis.com data: blob: filesystem: about:; img-src * https: blob: data:; style-src ${webview.cspSource
       }; script-src 'nonce-${nonce}';">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${stylesResetUri}" rel="stylesheet">
