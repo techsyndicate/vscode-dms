@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import axios from "axios";
 
-  let error = null;
+  let error = null; // shows error in chat
   let status = ""
   let finalMessages = [];
   let date = new Date();
@@ -21,7 +21,7 @@
       await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${accessToken}&socket_id=${socket.id}`
       );
     });
-    socket.emit("status", { user: message.sender, status: 'online'})
+    socket.emit("status", { user: accessToken, status: 'online'})
   };
 
   const getStatus = async() => {
@@ -55,7 +55,6 @@
     status = await getStatus()
     finalMessages = await getMessages();
     initSocket();
-    console.log(document.body)
     window.scrollTo(0, document.body.scrollHeight);
   });
 
@@ -121,7 +120,7 @@
         </g>
         </g></svg>
     </div>
-    <h4 class="dm-status">{status}</h4>
+    <h4 class="dm-status" id="dm-status">{status}</h4>
   </div>
   {#if error}
     <p>Error: {error.message}</p>

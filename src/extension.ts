@@ -80,9 +80,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('vscode-dms.sendMessage', async () => {
 		const editor = vscode.window.activeTextEditor;
 		const selection = editor && editor.selection;
-		var text = editor?.document.getText(selection)
-		// text is the code that is selected
-		console.log(text)
+		var code = editor?.document.getText(selection)
+		// code is the code that is selected
+		console.log(code)
 	} )
 
 	socket.on("connect", async () => {
