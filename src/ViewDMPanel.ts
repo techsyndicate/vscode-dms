@@ -134,6 +134,10 @@ export class ViewDMPanel {
     const receiveSocketUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "media", "receiveSocket.js")
     )
+
+    const getBase64Uri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "media", "getBase64.js")
+    )
     
     // Local path to css styles
     const styleResetPath = vscode.Uri.joinPath(
@@ -174,7 +178,7 @@ export class ViewDMPanel {
 					Use a content security policy to only allow loading images from https or from our extension directory,
 					and only allow scripts that have a specific nonce.
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src ${apiBaseUrl}; img-src https: data:; style-src ${
+        <meta http-equiv="Content-Security-Policy" content="default-src ${apiBaseUrl}; img-src https: blob: data:; style-src ${
       webview.cspSource
     }; script-src 'nonce-${nonce}';">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -184,6 +188,7 @@ export class ViewDMPanel {
         <link href="${cssUri}" rel="stylesheet">
         <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
         <script nonce="${nonce}" src="${receiveSocketUri}"></script>
+        <script nonce="${nonce}" src="${getBase64Uri}"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();
