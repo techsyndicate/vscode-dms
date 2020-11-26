@@ -110,17 +110,8 @@
   retrieveImageFromClipboardAsBase64(e, function(imageDataBase64){
       // If there's an image, open it in the browser as a new window :)
       if(imageDataBase64){
-          let bodyFormData = new FormData()
-          bodyFormData.append('image', imageDataBase64)
           // take the imageDataBase64 and post it to the imgur endpoint.
           console.log(imageDataBase64)
-          axios.post('https://api.imgur.com/3/upload', { data: bodyFormData, headers: { 'Authorization': `Client-ID 3fe3b0e7991b39c` } }) 
-          .then(res => {
-            console.log(res.data)
-          })
-          .catch(err => {
-            console.log(err)
-          })
           // the imgur endpoint gives an url for the image
           const imgURL = 'https://i.imgur.com/r2zDxHx.jpg'
           // need to take that url and pass it as the message property of the message object
