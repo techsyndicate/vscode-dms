@@ -30,7 +30,6 @@ function initSocket() {
             tsvscode.postMessage({ type: 'notificationMessage', value: msg });
         }
     });
-
     socket.on("status", status => {
         console.log(status)
         if (status.user == username) {

@@ -4,8 +4,8 @@
   import firebase from "firebase";
   import FormData from "form-data";
 
-  let error = null;
-  let status = "";
+  let error = null; // shows error in chat
+  let status = ""
   let finalMessages = [];
   let date = new Date();
   let message = {
@@ -29,7 +29,7 @@
         `${apiBaseUrl}/api/users/socket?access_token=${accessToken}&socket_id=${socket.id}`
       );
     });
-    socket.emit("status", { user: message.sender, status: "online" });
+    socket.emit("status", { user: accessToken, status: 'online'})
   };
 
   const getStatus = async () => {
@@ -185,6 +185,7 @@
     const messageInputBox = document.getElementById("message-input");
     messageInputBox.click();
     initSocket();
+    window.scrollTo(0, document.body.scrollHeight);
   });
 
   function dateToString(date) {
@@ -261,7 +262,7 @@
           <g xmlns="http://www.w3.org/2000/svg" />
         </g></svg>
     </div>
-    <h4 class="dm-status">{status}</h4>
+    <h4 class="dm-status" id="dm-status">{status}</h4>
   </div>
   {#if error}
     <p>Error: {error.message}</p>
