@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import axios from "axios";
-  import FormData from "form-data"
+  import firebase from "firebase";
+  import FormData from "form-data";
 
   let error = null;
-  let status = ""
+  let status = "";
   let finalMessages = [];
   let date = new Date();
   let message = {
@@ -17,20 +18,26 @@
     conversation_id: "",
   };
 
+  firebase.initializeApp(firebaseConfig);
+
+  const fileName = (length = 12) => Math.random().toString(20).substr(2, length);
+  const firebaseStorage = firebase.storage().ref().child(fileName());
+
   const sendSocketId = async () => {
     socket.on("connect", async (data) => {
-      await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${accessToken}&socket_id=${socket.id}`
+      await axios.get(
+        `${apiBaseUrl}/api/users/socket?access_token=${accessToken}&socket_id=${socket.id}`
       );
     });
-    socket.emit("status", { user: message.sender, status: 'online'})
+    socket.emit("status", { user: message.sender, status: "online" });
   };
 
-  const getStatus = async() => {
+  const getStatus = async () => {
     const res = await axios.get(
       `${apiBaseUrl}/api/users/${message.receiver}/status?access_token=${accessToken}`
     );
-    return res.data.status
-  }
+    return res.data.status;
+  };
 
   const getSenderUsername = async () => {
     const res = await axios.get(
@@ -39,99 +46,131 @@
     message.sender = res.data.username;
   };
 
-  const getMessages = async() => {
-      const res = await axios.get(`${apiBaseUrl}/api/messages/${message.receiver}?access_token=${accessToken}`)
-      let messages = res.data
-      return messages
-  }
+  const getMessages = async () => {
+    const res = await axios.get(
+      `${apiBaseUrl}/api/messages/${message.receiver}?access_token=${accessToken}`
+    );
+    let messages = res.data;
+    return messages;
+  };
 
-    /**
+  /**
    * This handler retrieves the images from the clipboard as a base64 string and returns it in a callback.
-   * 
-   * @param pasteEvent 
-   * @param callback 
+   *
+   * @param pasteEvent
+   * @param callback
    */
-  function retrieveImageFromClipboardAsBase64(pasteEvent, callback, imageFormat){
-    if(pasteEvent.clipboardData == false){
-          if(typeof(callback) == "function"){
-              callback(undefined);
-          }
-      };
-
-      var items = pasteEvent.clipboardData.items;
-
-      if(items == undefined){
-          if(typeof(callback) == "function"){
-              callback(undefined);
-          }
-      };
-
-      for (var i = 0; i < items.length; i++) {
-          // Skip content if not image
-          if (items[i].type.indexOf("image") == -1) continue;
-          // Retrieve image on clipboard as blob
-          var blob = items[i].getAsFile();
-
-          // Create an abstract canvas and get context
-          var mycanvas = document.createElement("canvas");
-          var ctx = mycanvas.getContext('2d');
-          
-          // Create an image
-          var img = new Image();
-
-          // Once the image loads, render the img on the canvas
-          img.onload = function(){
-              // Update dimensions of the canvas with the dimensions of the image
-              mycanvas.width = this.width;
-              mycanvas.height = this.height;
-
-              // Draw the image
-              ctx.drawImage(img, 0, 0);
-
-              // Execute callback with the base64 URI of the image
-              if(typeof(callback) == "function"){
-                  callback(mycanvas.toDataURL(
-                      (imageFormat || "image/png")
-                  ));
-              }
-          };
-
-          // Crossbrowser support for URL
-          var URLObj = window.URL || window.webkitURL;
-
-          // Creates a DOMString containing a URL representing the object given in the parameter
-          // namely the original Blob
-          img.src = URLObj.createObjectURL(blob);
+  function retrieveImageFromClipboardAsBase64(
+    pasteEvent,
+    callback,
+    imageFormat
+  ) {
+    if (pasteEvent.clipboardData == false) {
+      if (typeof callback == "function") {
+        callback(undefined);
       }
+    }
+
+    var items = pasteEvent.clipboardData.items;
+
+    if (items == undefined) {
+      if (typeof callback == "function") {
+        callback(undefined);
+      }
+    }
+
+    for (var i = 0; i < items.length; i++) {
+      // Skip content if not image
+      if (items[i].type.indexOf("image") == -1) continue;
+      // Retrieve image on clipboard as blob
+      var blob = items[i].getAsFile();
+
+      // Create an abstract canvas and get context
+      var mycanvas = document.createElement("canvas");
+      var ctx = mycanvas.getContext("2d");
+
+      // Create an image
+      var img = new Image();
+
+      // Once the image loads, render the img on the canvas
+      img.onload = function () {
+        // Update dimensions of the canvas with the dimensions of the image
+        mycanvas.width = this.width;
+        mycanvas.height = this.height;
+
+        // Draw the image
+        ctx.drawImage(img, 0, 0);
+
+        // Execute callback with the base64 URI of the image
+        if (typeof callback == "function") {
+          callback(mycanvas.toDataURL(imageFormat || "image/png"));
+        }
+      };
+
+      // Crossbrowser support for URL
+      var URLObj = window.URL || window.webkitURL;
+
+      // Creates a DOMString containing a URL representing the object given in the parameter
+      // namely the original Blob
+      img.src = URLObj.createObjectURL(blob);
+    }
   }
 
-  window.addEventListener("paste", function(e){
-  // Handle the event
-  retrieveImageFromClipboardAsBase64(e, function(imageDataBase64){
-      // If there's an image, open it in the browser as a new window :)
-      if(imageDataBase64){
-          // take the imageDataBase64 and post it to the imgur endpoint.
-          console.log(imageDataBase64)
-          // the imgur endpoint gives an url for the image
-          const imgURL = 'https://i.imgur.com/r2zDxHx.jpg'
-          // need to take that url and pass it as the message property of the message object
-          message.message = imgURL;
-          // set type as image
-          message.type = "image";
-          // set current date as message date
-          let date = new Date();
-          message.date = date;
-          // send the message
-          socket.emit('send-message', JSON.stringify(message));
-          // inflate the message
-          const messagesArea = document.getElementById('messages-area');
-          messagesArea.innerHTML = messagesArea.innerHTML + imageInflator(message);
-          document.sendMessage.reset();
-          const messageInputBox = document.getElementById('message-input')
-          messageInputBox.click();
-      }
-  }, 'png');
-  }, false);
+  window.addEventListener(
+    "paste",
+    function (e) {
+      // Handle the event
+      retrieveImageFromClipboardAsBase64(
+        e,
+        function (imageDataBase64) {
+          // If there's an image, open it in the browser as a new window :)
+          if (imageDataBase64) {
+            // take the imageDataBase64 and post it to the imgur endpoint.
+
+            const uploadTask = firebaseStorage.putString(
+              imageDataBase64,
+              "data_url"
+            );
+            let imageUrl = "";
+
+            uploadTask.on(
+              "state_changed",
+              function (snapshot) {},
+              function (error) {},
+              () => {
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadUrl) => {
+                  imageUrl = downloadUrl;
+                  console.log(`File uploaded at: ${downloadUrl}.`);
+
+                  // need to take that url and pass it as the message property of the message object
+                  message.message = imageUrl;
+                  // set type as image
+                  message.type = "image";
+                  // set current date as message date
+                  let date = new Date();
+                  message.date = date;
+                  // send the message
+                  socket.emit("send-message", JSON.stringify(message));
+                  // inflate the message
+                  const messagesArea = document.getElementById("messages-area");
+                  messagesArea.innerHTML =
+                    messagesArea.innerHTML + imageInflator(message);
+                  document.sendMessage.reset();
+                  const messageInputBox = document.getElementById(
+                    "message-input"
+                  );
+                  messageInputBox.click();
+                  window.scrollTo(0, document.body.scrollHeight);
+                });
+              }
+            );
+          }
+        },
+        "png"
+      );
+    },
+    false
+  );
 
   onMount(async () => {
     await getSenderUsername();
@@ -141,78 +180,85 @@
     } else {
       message.conversation_id = `${message.receiver}${message.sender}`;
     }
-    status = await getStatus()
+    status = await getStatus();
     finalMessages = await getMessages();
-    const messageInputBox = document.getElementById('message-input')
+    const messageInputBox = document.getElementById("message-input");
     messageInputBox.click();
     initSocket();
   });
 
   function dateToString(date) {
-      return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    return date.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
   }
 
   function messageInflator(message) {
-        date = dateToString(message.date)
-        return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><h4 class="msg-content">${message.message}</h4></div></div><br>`;
-    }
-
-  function imageInflator(message) {
-      date = dateToString(new Date(message.date))
-      return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><img class="image-content" src="${message.message}"></div><br>`;
+    date = dateToString(message.date);
+    return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><h4 class="msg-content">${message.message}</h4></div></div><br>`;
   }
 
+  function imageInflator(message) {
+    date = dateToString(new Date(message.date));
+    return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><img class="image-content" src="${message.message}"></div><br>`;
+  }
 </script>
 
 <main>
   <div class="navbar">
     <div class="navbar-inline">
       <img src={imageUrl} alt={username} class="dm-img" />
-      <a class="name-hyperlink" style="text-decoration: none;color: white;" href="https://github.com/{username}"><h3 class="dm-name">{username}</h3></a>
-      <svg 
-      class="notif-icon"
-      on:click={() => {
-        tsvscode.postMessage({ type: 'close' });
-      }}
-      xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 416 416" style="enable-background:new 0 0 512 512" xml:space="preserve"><g>
-        <g xmlns="http://www.w3.org/2000/svg">
-          <g>
+      <a
+        class="name-hyperlink"
+        style="text-decoration: none;color: white;"
+        href="https://github.com/{username}"><h3 class="dm-name">
+          {username}
+        </h3></a>
+      <svg
+        class="notif-icon"
+        on:click={() => {
+          tsvscode.postMessage({ type: 'close' });
+        }}
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:svgjs="http://svgjs.com/svgjs"
+        version="1.1"
+        width="512"
+        height="512"
+        x="0"
+        y="0"
+        viewBox="0 0 416 416"
+        style="enable-background:new 0 0 512 512"
+        xml:space="preserve"><g>
+          <g xmlns="http://www.w3.org/2000/svg">
             <g>
-              <path d="M208,416c23.573,0,42.667-19.093,42.667-42.667h-85.333C165.333,396.907,184.427,416,208,416z" fill="#ffffff" data-original="#000000" style=""/>
-              <path d="M336,288V181.333c0-65.6-34.88-120.32-96-134.827V32c0-17.707-14.293-32-32-32s-32,14.293-32,32v14.507     c-61.12,14.507-96,69.227-96,134.827V288l-42.667,42.667V352h341.333v-21.333L336,288z" fill="#ffffff" data-original="#000000" style=""/>
+              <g>
+                <path
+                  d="M208,416c23.573,0,42.667-19.093,42.667-42.667h-85.333C165.333,396.907,184.427,416,208,416z"
+                  fill="#ffffff"
+                  data-original="#000000"
+                  style="" />
+                <path
+                  d="M336,288V181.333c0-65.6-34.88-120.32-96-134.827V32c0-17.707-14.293-32-32-32s-32,14.293-32,32v14.507     c-61.12,14.507-96,69.227-96,134.827V288l-42.667,42.667V352h341.333v-21.333L336,288z"
+                  fill="#ffffff"
+                  data-original="#000000"
+                  style="" />
+              </g>
             </g>
           </g>
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
-        <g xmlns="http://www.w3.org/2000/svg">
-        </g>
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
+          <g xmlns="http://www.w3.org/2000/svg" />
         </g></svg>
     </div>
     <h4 class="dm-status">{status}</h4>
@@ -222,45 +268,46 @@
   {/if}
   <div class="messages-area" id="messages-area">
     {#each finalMessages as message}
-      {#if message.type == "text"}
-          <!-- single message div -->
-          <div class="msg">
-            <div class="message-inline">
-              <img
-                src="https://github.com/{message.sender}.png"
-                alt={message.sender}
-                class="msg-img" />
-              <h3 class="dm-name">
-                {message.sender}
-                <span
-                  class="date">{dateToString(new Date(message.date))}</span>
-              </h3>
-            </div>
-            <div class="msg-container">
-              <h4 class="msg-content">{message.message}</h4>
-            </div>
-          </div><br />
-          <!-- end of single message div -->
+      {#if message.type == 'text'}
+        <!-- single message div -->
+        <div class="msg">
+          <div class="message-inline">
+            <img
+              src="https://github.com/{message.sender}.png"
+              alt={message.sender}
+              class="msg-img" />
+            <h3 class="dm-name">
+              {message.sender}
+              <span class="date">{dateToString(new Date(message.date))}</span>
+            </h3>
+          </div>
+          <div class="msg-container">
+            <h4 class="msg-content">{message.message}</h4>
+          </div>
+        </div><br />
+        <!-- end of single message div -->
       {/if}
-      {#if message.type == "image"} 
-          <!-- single message div -->
-          <div class="msg">
-            <div class="message-inline">
-              <img
-                src="https://github.com/{message.sender}.png"
-                alt={message.sender}
-                class="msg-img" />
-              <h3 class="dm-name">
-                {message.sender}
-                <span
-                  class="date">{dateToString(new Date(message.date))}</span>
-              </h3>
-            </div>
-            <div class="msg-container">
-              <img class="image-content" src="{message.message}" alt="{message.sender}">
-            </div>
-          </div><br />
-          <!-- end of single message div -->
+      {#if message.type == 'image'}
+        <!-- single message div -->
+        <div class="msg">
+          <div class="message-inline">
+            <img
+              src="https://github.com/{message.sender}.png"
+              alt={message.sender}
+              class="msg-img" />
+            <h3 class="dm-name">
+              {message.sender}
+              <span class="date">{dateToString(new Date(message.date))}</span>
+            </h3>
+          </div>
+          <div class="msg-container">
+            <img
+              class="image-content"
+              src={message.message}
+              alt={message.sender} />
+          </div>
+        </div><br />
+        <!-- end of single message div -->
       {/if}
     {:else}
       <p>loading..</p>
@@ -269,19 +316,20 @@
   <div class="input-box">
     <div class="input-inline">
       <form
-        action="" name="sendMessage"
+        action=""
+        name="sendMessage"
         on:submit={() => {
           let messageInput = document.getElementById('message-input').value;
-          if (messageInput != "") {
-          message.message = messageInput;
-          let date = new Date();
-          message.date = date;
-          message.type = "text"
-          socket.emit('send-message', JSON.stringify(message));
-          const messagesArea = document.getElementById('messages-area');
-          messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(message);
-          document.sendMessage.reset()
-          window.scrollTo(0,document.body.scrollHeight);
+          if (messageInput != '') {
+            message.message = messageInput;
+            let date = new Date();
+            message.date = date;
+            message.type = 'text';
+            socket.emit('send-message', JSON.stringify(message));
+            const messagesArea = document.getElementById('messages-area');
+            messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(message);
+            document.sendMessage.reset();
+            window.scrollTo(0, document.body.scrollHeight);
           }
         }}>
         <input
@@ -290,9 +338,9 @@
           placeholder="Message"
           value=""
           autofocus
-          on:click={()=> {
-            window.scrollTo(0,document.body.scrollHeight);
-          }}/>
+          on:click={() => {
+            window.scrollTo(0, document.body.scrollHeight);
+          }} />
       </form>
     </div>
   </div>
