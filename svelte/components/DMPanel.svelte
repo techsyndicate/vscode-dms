@@ -156,6 +156,7 @@
         action="" name="sendMessage"
         on:submit={() => {
           let messageInput = document.getElementById('message-input').value;
+          if (messageInput != "") {
           message.message = messageInput;
           let date = new Date();
           message.date = date;
@@ -164,6 +165,7 @@
           messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(message);
           document.sendMessage.reset()
           window.scrollTo(0,document.body.scrollHeight);
+          }
         }}>
         <input
           class="message-input"

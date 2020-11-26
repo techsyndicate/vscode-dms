@@ -20,6 +20,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 	console.log('yoz! vscode-dms is active.');
 
+	let res = await axios.get(`${apiBaseUrl}/api/users?access_token=${Util.getAccessToken()}`)
+	let loginUser = res.data
+
 	const socket = io.connect(apiBaseUrl);
 	console.log(socket)
 	console.log('socket initialized')
@@ -29,14 +32,13 @@ export async function activate(context: vscode.ExtensionContext) {
 		  await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${socket.id}`
 		  );
 		});
-		socket.emit("status", { user: 'sheldor1510', status: 'online'})
+		socket.emit("status", { user: loginUser.username, status: 'online'})
 	};
 
 	await sendSocketId()
 
     socket.on("receive-message", (msg: { sender: string; message: string; receiver: string; }) => {
-		console.log(msg)
-		if(msg.receiver == "sheldor1510") {
+		if(msg.receiver == loginUser.username) {
 		vscode.window.showInformationMessage(msg.sender + ': '+ msg.message)
 		}
     });
