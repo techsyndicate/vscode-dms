@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import axios from "axios";
+  import FormData from "form-data"
 
   let error = null;
   let status = ""
@@ -44,6 +45,103 @@
       return messages
   }
 
+    /**
+   * This handler retrieves the images from the clipboard as a base64 string and returns it in a callback.
+   * 
+   * @param pasteEvent 
+   * @param callback 
+   */
+  function retrieveImageFromClipboardAsBase64(pasteEvent, callback, imageFormat){
+    if(pasteEvent.clipboardData == false){
+          if(typeof(callback) == "function"){
+              callback(undefined);
+          }
+      };
+
+      var items = pasteEvent.clipboardData.items;
+
+      if(items == undefined){
+          if(typeof(callback) == "function"){
+              callback(undefined);
+          }
+      };
+
+      for (var i = 0; i < items.length; i++) {
+          // Skip content if not image
+          if (items[i].type.indexOf("image") == -1) continue;
+          // Retrieve image on clipboard as blob
+          var blob = items[i].getAsFile();
+
+          // Create an abstract canvas and get context
+          var mycanvas = document.createElement("canvas");
+          var ctx = mycanvas.getContext('2d');
+          
+          // Create an image
+          var img = new Image();
+
+          // Once the image loads, render the img on the canvas
+          img.onload = function(){
+              // Update dimensions of the canvas with the dimensions of the image
+              mycanvas.width = this.width;
+              mycanvas.height = this.height;
+
+              // Draw the image
+              ctx.drawImage(img, 0, 0);
+
+              // Execute callback with the base64 URI of the image
+              if(typeof(callback) == "function"){
+                  callback(mycanvas.toDataURL(
+                      (imageFormat || "image/png")
+                  ));
+              }
+          };
+
+          // Crossbrowser support for URL
+          var URLObj = window.URL || window.webkitURL;
+
+          // Creates a DOMString containing a URL representing the object given in the parameter
+          // namely the original Blob
+          img.src = URLObj.createObjectURL(blob);
+      }
+  }
+
+  window.addEventListener("paste", function(e){
+  // Handle the event
+  retrieveImageFromClipboardAsBase64(e, function(imageDataBase64){
+      // If there's an image, open it in the browser as a new window :)
+      if(imageDataBase64){
+          let bodyFormData = new FormData()
+          bodyFormData.append('image', imageDataBase64)
+          // take the imageDataBase64 and post it to the imgur endpoint.
+          console.log(imageDataBase64)
+          axios.post('https://api.imgur.com/3/upload', { data: bodyFormData, headers: { 'Authorization': `Client-ID 3fe3b0e7991b39c` } }) 
+          .then(res => {
+            console.log(res.data)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+          // the imgur endpoint gives an url for the image
+          const imgURL = 'https://i.imgur.com/r2zDxHx.jpg'
+          // need to take that url and pass it as the message property of the message object
+          message.message = imgURL;
+          // set type as image
+          message.type = "image";
+          // set current date as message date
+          let date = new Date();
+          message.date = date;
+          // send the message
+          socket.emit('send-message', JSON.stringify(message));
+          // inflate the message
+          const messagesArea = document.getElementById('messages-area');
+          messagesArea.innerHTML = messagesArea.innerHTML + imageInflator(message);
+          document.sendMessage.reset();
+          const messageInputBox = document.getElementById('message-input')
+          messageInputBox.click();
+      }
+  }, 'png');
+  }, false);
+
   onMount(async () => {
     await getSenderUsername();
     await sendSocketId();
@@ -54,9 +152,9 @@
     }
     status = await getStatus()
     finalMessages = await getMessages();
+    const messageInputBox = document.getElementById('message-input')
+    messageInputBox.click();
     initSocket();
-    console.log(document.body)
-    window.scrollTo(0, document.body.scrollHeight);
   });
 
   function dateToString(date) {
@@ -67,6 +165,11 @@
         date = dateToString(message.date)
         return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><h4 class="msg-content">${message.message}</h4></div></div><br>`;
     }
+
+  function imageInflator(message) {
+      date = dateToString(new Date(message.date))
+      return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><img class="image-content" src="${message.message}"></div><br>`;
+  }
 
 </script>
 
@@ -128,24 +231,46 @@
   {/if}
   <div class="messages-area" id="messages-area">
     {#each finalMessages as message}
-      <!-- single message div -->
-      <div class="msg">
-        <div class="message-inline">
-          <img
-            src="https://github.com/{message.sender}.png"
-            alt={message.sender}
-            class="msg-img" />
-          <h3 class="dm-name">
-            {message.sender}
-            <span
-              class="date">{dateToString(new Date(message.date))}</span>
-          </h3>
-        </div>
-        <div class="msg-container">
-          <h4 class="msg-content">{message.message}</h4>
-        </div>
-      </div><br />
-      <!-- end of single message div -->
+      {#if message.type == "text"}
+          <!-- single message div -->
+          <div class="msg">
+            <div class="message-inline">
+              <img
+                src="https://github.com/{message.sender}.png"
+                alt={message.sender}
+                class="msg-img" />
+              <h3 class="dm-name">
+                {message.sender}
+                <span
+                  class="date">{dateToString(new Date(message.date))}</span>
+              </h3>
+            </div>
+            <div class="msg-container">
+              <h4 class="msg-content">{message.message}</h4>
+            </div>
+          </div><br />
+          <!-- end of single message div -->
+      {/if}
+      {#if message.type == "image"} 
+          <!-- single message div -->
+          <div class="msg">
+            <div class="message-inline">
+              <img
+                src="https://github.com/{message.sender}.png"
+                alt={message.sender}
+                class="msg-img" />
+              <h3 class="dm-name">
+                {message.sender}
+                <span
+                  class="date">{dateToString(new Date(message.date))}</span>
+              </h3>
+            </div>
+            <div class="msg-container">
+              <img class="image-content" src="{message.message}" alt="{message.sender}">
+            </div>
+          </div><br />
+          <!-- end of single message div -->
+      {/if}
     {:else}
       <p>loading..</p>
     {/each}
@@ -160,6 +285,7 @@
           message.message = messageInput;
           let date = new Date();
           message.date = date;
+          message.type = "text"
           socket.emit('send-message', JSON.stringify(message));
           const messagesArea = document.getElementById('messages-area');
           messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(message);

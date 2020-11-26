@@ -113,3 +113,8 @@
 .notif-icon:hover {
     cursor: pointer
 }
+
+.image-content {
+    margin-left: 50px;
+    border-radius: 7px;
+}
