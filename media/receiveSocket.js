@@ -17,7 +17,7 @@ function initSocket() {
             messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
             window.scrollTo(0, document.body.scrollHeight);
         } else {
-            console.log('blocked message')
+            tsvscode.postMessage({ type: 'notificationMessage', value: msg });
         }
     });
 

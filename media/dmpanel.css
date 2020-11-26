@@ -102,3 +102,14 @@
 .name-hyperlink:focus {
     outline: none;
 }
+
+.notif-icon {
+    height: 22px;
+    width: 22px;
+    margin-left: 55%;
+    margin-top: 10px
+}
+
+.notif-icon:hover {
+    cursor: pointer
+}

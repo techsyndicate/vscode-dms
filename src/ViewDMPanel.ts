@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { apiBaseUrl } from "./constants";
 import { getNonce } from "./getNonce";
 import { Util } from "./util";
+import axios from 'axios';
 
 export class ViewDMPanel {
   /**
@@ -14,9 +15,10 @@ export class ViewDMPanel {
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionUri: vscode.Uri;
   private _user: any;
+  private _socketID: any;
   private _disposables: vscode.Disposable[] = [];
 
-  public static createOrShow(extensionUri: vscode.Uri, user: any) {
+  public static createOrShow(extensionUri: vscode.Uri, user: any, socketID: any) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
       : undefined;
@@ -25,6 +27,7 @@ export class ViewDMPanel {
     if (ViewDMPanel.currentPanel) {
       ViewDMPanel.currentPanel._panel.reveal(column);
       ViewDMPanel.currentPanel._user = user;
+      ViewDMPanel.currentPanel._socketID = socketID;
       ViewDMPanel.currentPanel._update();
       return;
     }
@@ -48,30 +51,35 @@ export class ViewDMPanel {
     ViewDMPanel.currentPanel = new ViewDMPanel(
       panel,
       extensionUri,
-      user
+      user,
+      socketID
     );
   }
 
   public static revive(
     panel: vscode.WebviewPanel,
     extensionUri: vscode.Uri,
-    user: any
+    user: any,
+    socketID: string
   ) {
     ViewDMPanel.currentPanel = new ViewDMPanel(
       panel,
       extensionUri,
-      user
+      user,
+      socketID
     );
   }
 
   private constructor(
     panel: vscode.WebviewPanel,
     extensionUri: vscode.Uri,
-    user: string
+    user: string,
+    socketID: string
   ) {
     this._panel = panel;
     this._extensionUri = extensionUri;
     this._user = user;
+    this._socketID = socketID
 
     // Set the webview's initial html content
     this._update();
@@ -99,6 +107,22 @@ export class ViewDMPanel {
     const webview = this._panel.webview;
 
     this._panel.webview.html = this._getHtmlForWebview(webview);
+    webview.onDidReceiveMessage(async (data) => {
+      switch (data.type) {
+        case "notificationMessage": {
+          vscode.window.showInformationMessage(data.value.sender + ': '+ data.value.message)
+          console.log(data.value)
+          console.log(data.value.message)
+          break;
+        }
+        case "close": {
+          await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${this._socketID}`)
+          vscode.window.showInformationMessage('You will now recieve notifications while working')
+          vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+          break;
+        }
+      }
+    });
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {

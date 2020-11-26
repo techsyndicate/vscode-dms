@@ -11,7 +11,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
   _doc?: vscode.TextDocument;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(private readonly _extensionUri: vscode.Uri, private readonly socketID: any) {}
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -34,7 +34,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
           if (!data.value) {
             return;
           }
-          ViewDMPanel.createOrShow(this._extensionUri, data.value)
+          ViewDMPanel.createOrShow(this._extensionUri, data.value, this.socketID)
           break;
         }
         case "onError": {

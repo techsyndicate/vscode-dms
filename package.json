@@ -10,6 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
+		"*",
 		"onView:dm-full"
 	],
 	"main": "./dist/extension.js",
@@ -58,13 +59,7 @@
 					"contextualTitle": "Direct Messages"
 				}
 			]
-		},
-		"viewsWelcome": [
-			{
-				"view": "vscode-dms",
-				"contents": "Welcome to Direct Messages for Visual Studio Code [learn more](https://github.com/techsyndicate/vscode-dms).\n[Start Messaging](command:vscode-dms.startMessaging)"
-			}
-		]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
@@ -108,12 +103,14 @@
 		"webpack-cli": "^3.3.12"
 	},
 	"dependencies": {
+		"@types/circular-json": "^0.4.0",
 		"@types/jest": "^26.0.15",
 		"@types/jquery": "^3.5.4",
 		"@types/node-fetch": "^2.5.7",
 		"@types/polka": "^0.5.1",
 		"@types/socket.io-client": "^1.4.34",
 		"axios": "^0.21.0",
+		"circular-json": "^0.5.9",
 		"fs": "0.0.1-security",
 		"jest": "^26.6.3",
 		"jquery": "^3.5.1",

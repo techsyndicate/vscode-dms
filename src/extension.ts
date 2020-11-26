@@ -2,7 +2,9 @@ import * as vscode from 'vscode';
 import { authenticate } from "./authenticate"
 import { DMSidebarProvider } from "./DMSidebarProvider";
 import { Util } from "./util"
-import * as fs from "fs"
+import { apiBaseUrl } from './constants'
+const io = require("socket.io-client")
+import axios from 'axios'
 
 export async function activate(context: vscode.ExtensionContext) {
 	Util.context = context;
@@ -17,6 +19,27 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	}
 	console.log('yoz! vscode-dms is active.');
+
+	const socket = io.connect(apiBaseUrl);
+	console.log(socket)
+	console.log('socket initialized')
+
+	const sendSocketId = async () => {
+		socket.on("connect", async () => {
+		  await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${socket.id}`
+		  );
+		});
+		socket.emit("status", { user: 'sheldor1510', status: 'online'})
+	};
+
+	await sendSocketId()
+
+    socket.on("receive-message", (msg: { sender: string; message: string; receiver: string; }) => {
+		console.log(msg)
+		if(msg.receiver == "sheldor1510") {
+		vscode.window.showInformationMessage(msg.sender + ': '+ msg.message)
+		}
+    });
 
 	vscode.commands.registerCommand('vscode-dms.info', () => {
 		const panel = vscode.window.createWebviewPanel(
@@ -60,10 +83,13 @@ export async function activate(context: vscode.ExtensionContext) {
 		console.log(text)
 	} )
 
-	const provider = new DMSidebarProvider(context.extensionUri);
-	context.subscriptions.push(
-	  vscode.window.registerWebviewViewProvider("dm-full", provider)
-	);
+	socket.on("connect", async () => {
+		const socketID = await socket.id
+		const provider = new DMSidebarProvider(context.extensionUri, socketID);
+		context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider("dm-full", provider)
+		);
+	});
 }
 
 
