@@ -20,9 +20,6 @@
 
   firebase.initializeApp(firebaseConfig);
 
-  const fileName = (length = 12) => Math.random().toString(20).substr(2, length);
-  const firebaseStorage = firebase.storage().ref().child(fileName());
-
   const sendSocketId = async () => {
     socket.on("connect", async (data) => {
       await axios.get(
@@ -126,6 +123,8 @@
           // If there's an image, open it in the browser as a new window :)
           if (imageDataBase64) {
             // take the imageDataBase64 and post it to the imgur endpoint.
+            const fileName = (length = 12) => Math.random().toString(20).substr(2, length);
+            const firebaseStorage = firebase.storage().ref().child(fileName());
 
             const uploadTask = firebaseStorage.putString(
               imageDataBase64,
@@ -199,7 +198,7 @@
 
   function imageInflator(message) {
     date = dateToString(new Date(message.date));
-    return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><img class="image-content" src="${message.message}"></div><br>`;
+    return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><a href="${message.message}"><img class="image-content" src="${message.message}"></a></div><br>`;
   }
 </script>
 
@@ -302,10 +301,12 @@
             </h3>
           </div>
           <div class="msg-container">
-            <img
-              class="image-content"
-              src={message.message}
-              alt={message.sender} />
+          <a href="{message.message}">
+              <img
+                class="image-content"
+                src={message.message}
+                alt={message.sender} />
+            </a>
           </div>
         </div><br />
         <!-- end of single message div -->
