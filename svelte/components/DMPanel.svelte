@@ -212,6 +212,7 @@
         href="https://github.com/{username}"><h3 class="dm-name">
           {username}
         </h3></a>
+      <div title="Close this tab and continue receiving notifications while you're working"> 
       <svg
         class="notif-icon"
         on:click={() => {
@@ -259,7 +260,7 @@
           <g xmlns="http://www.w3.org/2000/svg" />
           <g xmlns="http://www.w3.org/2000/svg" />
           <g xmlns="http://www.w3.org/2000/svg" />
-        </g></svg>
+        </g></svg></div>
     </div>
     <h4 class="dm-status" id="dm-status">{status}</h4>
   </div>

@@ -106,8 +106,9 @@
 .notif-icon {
     height: 22px;
     width: 22px;
-    margin-left: 55%;
-    margin-top: 10px
+    position: fixed;
+    top: 15px;
+    right: 15px;
 }
 
 .notif-icon:hover {
@@ -117,4 +118,6 @@
 .image-content {
     margin-left: 50px;
     border-radius: 7px;
+    max-width: 70%;
+    height: auto;
 }
