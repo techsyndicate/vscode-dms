@@ -116,13 +116,11 @@
   window.addEventListener(
     "paste",
     function (e) {
-      // Handle the event
       retrieveImageFromClipboardAsBase64(
         e,
         function (imageDataBase64) {
-          // If there's an image, open it in the browser as a new window :)
           if (imageDataBase64) {
-            // take the imageDataBase64 and post it to the imgur endpoint.
+            // assigns randomly generated string for image name
             const fileName = (length = 12) => Math.random().toString(20).substr(2, length);
             const firebaseStorage = firebase.storage().ref().child(fileName());
 
@@ -153,7 +151,7 @@
                   // inflate the message
                   const messagesArea = document.getElementById("messages-area");
                   messagesArea.innerHTML =
-                    messagesArea.innerHTML + imageInflator(message);
+                    messagesArea.innerHTML + firebaseImageInflator(message);
                   document.sendMessage.reset();
                   const messageInputBox = document.getElementById(
                     "message-input"
@@ -191,12 +189,33 @@
     return date.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
   }
 
-  function messageInflator(message) {
-    date = dateToString(message.date);
-    return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><h4 class="msg-content">${message.message}</h4></div></div><br>`;
+  function isUrl(s) {
+   var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+   return regexp.test(s);
   }
 
-  function imageInflator(message) {
+  function isImageUrl(url) {
+    return(url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+  }
+
+  function messageInflator(message) {
+    date = dateToString(message.date);
+    if (isUrl(message.message)) {
+      if (isImageUrl(message.message)) {
+        // render the image
+        return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><a href="${message.message}"><img class="image-content" src="${message.message}"></a></div><br>`;
+      } else {
+        // hyperlink message
+        return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><a href="${message.message}" style="text-decoration: none;"><h4 class="msg-content">${message.message}</h4></a></div></div><br>`;
+      }
+    } else {
+      // standard text message
+      return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><h4 class="msg-content">${message.message}</h4></div></div><br>`;
+    }
+  }
+
+  // inflate images when using Ctrl + V
+  function firebaseImageInflator(message) {
     date = dateToString(new Date(message.date));
     return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><a href="${message.message}"><img class="image-content" src="${message.message}"></a></div><br>`;
   }
@@ -212,55 +231,57 @@
         href="https://github.com/{username}"><h3 class="dm-name">
           {username}
         </h3></a>
-      <div title="Close this tab and continue receiving notifications while you're working"> 
-      <svg
-        class="notif-icon"
-        on:click={() => {
-          tsvscode.postMessage({ type: 'close' });
-        }}
-        xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        xmlns:svgjs="http://svgjs.com/svgjs"
-        version="1.1"
-        width="512"
-        height="512"
-        x="0"
-        y="0"
-        viewBox="0 0 416 416"
-        style="enable-background:new 0 0 512 512"
-        xml:space="preserve"><g>
-          <g xmlns="http://www.w3.org/2000/svg">
-            <g>
+      <div
+        title="Close this tab and continue receiving notifications while you're working">
+        <svg
+          class="notif-icon"
+          on:click={() => {
+            tsvscode.postMessage({ type: 'close' });
+          }}
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svgjs="http://svgjs.com/svgjs"
+          version="1.1"
+          width="512"
+          height="512"
+          x="0"
+          y="0"
+          viewBox="0 0 416 416"
+          style="enable-background:new 0 0 512 512"
+          xml:space="preserve"><g>
+            <g xmlns="http://www.w3.org/2000/svg">
               <g>
-                <path
-                  d="M208,416c23.573,0,42.667-19.093,42.667-42.667h-85.333C165.333,396.907,184.427,416,208,416z"
-                  fill="#ffffff"
-                  data-original="#000000"
-                  style="" />
-                <path
-                  d="M336,288V181.333c0-65.6-34.88-120.32-96-134.827V32c0-17.707-14.293-32-32-32s-32,14.293-32,32v14.507     c-61.12,14.507-96,69.227-96,134.827V288l-42.667,42.667V352h341.333v-21.333L336,288z"
-                  fill="#ffffff"
-                  data-original="#000000"
-                  style="" />
+                <g>
+                  <path
+                    d="M208,416c23.573,0,42.667-19.093,42.667-42.667h-85.333C165.333,396.907,184.427,416,208,416z"
+                    fill="#ffffff"
+                    data-original="#000000"
+                    style="" />
+                  <path
+                    d="M336,288V181.333c0-65.6-34.88-120.32-96-134.827V32c0-17.707-14.293-32-32-32s-32,14.293-32,32v14.507     c-61.12,14.507-96,69.227-96,134.827V288l-42.667,42.667V352h341.333v-21.333L336,288z"
+                    fill="#ffffff"
+                    data-original="#000000"
+                    style="" />
+                </g>
               </g>
             </g>
-          </g>
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-          <g xmlns="http://www.w3.org/2000/svg" />
-        </g></svg></div>
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+            <g xmlns="http://www.w3.org/2000/svg" />
+          </g></svg>
+      </div>
     </div>
     <h4 class="dm-status" id="dm-status">{status}</h4>
   </div>
@@ -302,7 +323,7 @@
             </h3>
           </div>
           <div class="msg-container">
-          <a href="{message.message}">
+            <a href={message.message}>
               <img
                 class="image-content"
                 src={message.message}
