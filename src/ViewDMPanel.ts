@@ -79,7 +79,7 @@ export class ViewDMPanel {
     this._panel = panel;
     this._extensionUri = extensionUri;
     this._user = user;
-    this._socketID = socketID
+    this._socketID = socketID;
 
     // Set the webview's initial html content
     this._update();
@@ -110,14 +110,14 @@ export class ViewDMPanel {
     webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
         case "notificationMessage": {
-          vscode.window.showInformationMessage(data.value.sender + ': '+ data.value.message)
-          console.log(data.value)
-          console.log(data.value.message)
+          vscode.window.showInformationMessage(data.value.sender + ': ' + data.value.message);
+          console.log(data.value);
+          console.log(data.value.message);
           break;
         }
         case "close": {
-          await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${this._socketID}`)
-          vscode.window.showInformationMessage('You will now recieve notifications while working')
+          await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${this._socketID}`);
+          vscode.window.showInformationMessage('You will now recieve notifications while working');
           vscode.commands.executeCommand("workbench.action.closeActiveEditor");
           break;
         }
@@ -133,33 +133,37 @@ export class ViewDMPanel {
 
     const receiveSocketUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "media", "receiveSocket.js")
-    )
-    
+    );
+
+    const firebaseConfig = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "media", "firebase.js")
+    );
+
     // Local path to css styles
     const styleResetPath = vscode.Uri.joinPath(
-        this._extensionUri,
-        "media",
-        "reset.css"
+      this._extensionUri,
+      "media",
+      "reset.css"
     );
 
     const stylesPathMainPath = vscode.Uri.joinPath(
-        this._extensionUri,
-        "media",
-        "vscode.css"
+      this._extensionUri,
+      "media",
+      "vscode.css"
     );
 
     const stylesDMPanelPath = vscode.Uri.joinPath(
       this._extensionUri,
       "media",
       "dmpanel.css"
-  );
-    
+    );
+
     // Uri to load styles into webview
     const stylesResetUri = webview.asWebviewUri(styleResetPath);
     const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
     const styleDMPanelUri = webview.asWebviewUri(stylesDMPanelPath);
     const cssUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(this._extensionUri, "out", "compiled/dmpanel.css")
+      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/dmpanel.css")
     );
 
 
@@ -174,9 +178,8 @@ export class ViewDMPanel {
 					Use a content security policy to only allow loading images from https or from our extension directory,
 					and only allow scripts that have a specific nonce.
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src ${apiBaseUrl}; img-src https: data:; style-src ${
-      webview.cspSource
-    }; script-src 'nonce-${nonce}';">
+        <meta http-equiv="Content-Security-Policy" content="default-src * ${apiBaseUrl} https://*.googleapis.com data: blob: filesystem: about:; img-src * https: blob: data:; style-src ${webview.cspSource
+      }; script-src 'nonce-${nonce}';">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${stylesResetUri}" rel="stylesheet">
         <link href="${stylesMainUri}" rel="stylesheet">
@@ -184,6 +187,7 @@ export class ViewDMPanel {
         <link href="${cssUri}" rel="stylesheet">
         <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
         <script nonce="${nonce}" src="${receiveSocketUri}"></script>
+        <script nonce="${nonce}" src="${firebaseConfig}"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();
