@@ -4,8 +4,12 @@ import commonjs from "@rollup/plugin-commonjs";
 import { terser } from "rollup-plugin-terser";
 import sveltePreprocess from "svelte-preprocess";
 import typescript from "@rollup/plugin-typescript";
+import replace from '@rollup/plugin-replace';
 import path from "path";
 import fs from "fs";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -47,6 +51,19 @@ export default fs
           tsconfig: "svelte/tsconfig.json",
           sourceMap: !production,
           inlineSources: !production,
+        }),
+        replace({
+          firebaseSecrets: JSON.stringify({
+            env: {
+              apiKey: process.env.API_KEY,
+              authDomain: process.env.AUTH_DOMAIN,
+              databaseUrl: process.env.DATABASE_URL,
+              projectId: process.env.PROJECT_ID,
+              storageBucket: process.env.STORAGE_BUCKET,
+              messagingSenderId: process.env.MESSAGING_SENDER_ID,
+              appId: process.env.APP_ID
+            }
+          })
         }),
 
         // In dev mode, call `npm run start` once

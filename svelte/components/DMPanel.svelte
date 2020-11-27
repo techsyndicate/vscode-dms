@@ -18,6 +18,16 @@
     conversation_id: "",
   };
 
+  let firebaseConfig = {
+    apiKey: firebaseSecrets.env.apiKey,
+    authDomain: firebaseSecrets.env.authDomain,
+    databaseURL: firebaseSecrets.env.databaseUrl,
+    projectId: firebaseSecrets.env.projectId,
+    storageBucket: firebaseSecrets.env.storageBucket,
+    messagingSenderId: firebaseSecrets.env.messagingSenderId,
+    appId: firebaseSecrets.env.appId,
+  }
+
   firebase.initializeApp(firebaseConfig);
 
   const sendSocketId = async () => {
