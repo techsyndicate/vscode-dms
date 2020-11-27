@@ -1,7 +1,28 @@
-function initSocket() {
+async function initSocket() {
     console.log('socket initialized')
     const messagesArea = document.getElementById('messages-area')
     const Status = document.getElementById('dm-status')
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    while (true) {
+        try {
+            let msg = document.getElementsByClassName('msg')
+            if (msg.length == 0) {
+                throw "empty array"
+            } else {
+                window.scrollTo(0, document.body.scrollHeight);
+                console.log('success')
+                break
+            }
+        } catch (err) {
+            console.log(err)
+            console.log('error')
+            await sleep(500)
+        }
+    }
 
     function dateToString(date) {
         return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
@@ -19,10 +40,10 @@ function initSocket() {
 
     socket.on("receive-message", msg => {
         if (msg.sender == username) {
-            if(msg.type == "text") {
+            if (msg.type == "text") {
                 messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
             }
-            if(msg.type == "image") {
+            if (msg.type == "image") {
                 messagesArea.innerHTML = messagesArea.innerHTML + imageInflator(msg);
             }
             window.scrollTo(0, document.body.scrollHeight);

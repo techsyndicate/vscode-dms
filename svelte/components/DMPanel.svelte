@@ -183,7 +183,7 @@
     finalMessages = await getMessages();
     const messageInputBox = document.getElementById("message-input");
     messageInputBox.click();
-    initSocket();
+    await initSocket();
     window.scrollTo(0, document.body.scrollHeight);
   });
 

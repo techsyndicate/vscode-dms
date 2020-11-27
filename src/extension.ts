@@ -77,13 +77,29 @@ export async function activate(context: vscode.ExtensionContext) {
 	  </html>`;
 	}
 
-	vscode.commands.registerCommand('vscode-dms.sendMessage', async () => {
+	vscode.commands.registerCommand('vscode-dms.sendMessage', async() => {
 		const editor = vscode.window.activeTextEditor;
 		const selection = editor && editor.selection;
-		var code = editor?.document.getText(selection)
+		let code = editor?.document.getText(selection)
 		// code is the code that is selected
-		console.log(code)
-	} )
+		let loginUser = await axios.get(`${apiBaseUrl}/api/users?access_token=${Util.getAccessToken()}`)
+		let conversation_id = ""
+		if (loginUser.data.username < loginUser.data.chat.last_user) {
+			conversation_id = `${loginUser.data.username}${loginUser.data.chat.last_user}`;
+		} else {
+			conversation_id = `${loginUser.data.chat.last_user}${loginUser.data.username}`;
+		}
+		console.log(conversation_id)
+		socket.emit('send-message', JSON.stringify({
+			access_token: Util.getAccessToken(),
+			sender: loginUser.data.username,
+			receiver: loginUser.data.chat.last_user,
+			date: new Date(),
+			type: "code",
+			message: code,
+			conversation_id: conversation_id,
+		}))
+	})
 
 	socket.on("connect", async () => {
 		const socketID = await socket.id
