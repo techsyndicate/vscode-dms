@@ -1,3 +1,7 @@
+<svelte:head>
+  <link href="https://fonts.googleapis.com/css?family=Consolas" rel="stylesheet">
+</svelte:head>
+
 <script lang="ts">
   import { onMount } from "svelte";
   import axios from "axios";
@@ -61,7 +65,7 @@
     for (let i = 0; i < messages.length; i++) {
         if(messages[i].type == "code") {
            const initialMessage = messages[i].message
-           const newMessage = initialMessage.replace(/\n/g, '<br>').replace(/\r/g, '').replace(/\t/g, '    ')
+           const newMessage = initialMessage.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"')
            console.log(newMessage)
            messages[i].message = newMessage
         }
@@ -374,7 +378,7 @@
           </div>
           <div class="msg-container">
             <div class="code">
-              {message.message}
+              {@html message.message}
             </div>
           </div>
         </div><br />
