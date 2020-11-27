@@ -135,10 +135,6 @@ export class ViewDMPanel {
       vscode.Uri.joinPath(this._extensionUri, "media", "receiveSocket.js")
     );
 
-    const firebaseConfig = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "media", "firebase.js")
-    );
-
     // Local path to css styles
     const styleResetPath = vscode.Uri.joinPath(
       this._extensionUri,
@@ -187,7 +183,6 @@ export class ViewDMPanel {
         <link href="${cssUri}" rel="stylesheet">
         <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
         <script nonce="${nonce}" src="${receiveSocketUri}"></script>
-        <script nonce="${nonce}" src="${firebaseConfig}"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();

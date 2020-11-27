@@ -113,6 +113,7 @@
 		"@types/socket.io-client": "^1.4.34",
 		"axios": "^0.21.0",
 		"circular-json": "^0.5.9",
+		"dotenv": "^8.2.0",
 		"firebase": "^8.1.1",
 		"form-data": "^3.0.0",
 		"fs": "0.0.1-security",
