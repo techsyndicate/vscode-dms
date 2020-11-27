@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Code');
+
 .navbar {
     height: 60px;
     width: 150%;
@@ -121,3 +123,18 @@
     max-width: 70%;
     height: auto;
 }
+
+.code {
+    font-family: 'Fira Code';
+    max-width: 60%;
+    height: auto;
+    background-color: #292D3E;
+    margin-left: 50px;
+    border-radius: 3px;
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    color: white;
+    font-size: 15px;
+  }

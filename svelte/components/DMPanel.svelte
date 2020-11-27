@@ -47,7 +47,15 @@
     const res = await axios.get(
       `${apiBaseUrl}/api/messages/${message.receiver}?access_token=${accessToken}`
     );
-    let messages = res.data;
+    const messages = res.data;
+    for (let i = 0; i < messages.length; i++) {
+        if(messages[i].type == "code") {
+           const initialMessage = messages[i].message
+           const newMessage = initialMessage.replace(/\n/g, '<br>').replace(/\r/g, '').replace(/\t/g, '    ')
+           console.log(newMessage)
+           messages[i].message = newMessage
+        }
+    }
     return messages;
   };
 
@@ -304,7 +312,15 @@
             </h3>
           </div>
           <div class="msg-container">
-            <h4 class="msg-content">{message.message}</h4>
+            {#if isUrl(message.message)}
+              {#if isImageUrl(message.message)}
+                  <a href={message.message} style="text-decoration: none"><img class="image-content" src="{message.message}" alt="{message.sender}"></a>
+              {:else}
+                  <a href={message.message} style="text-decoration: none"><h4 class="msg-content">{message.message}</h4></a>
+              {/if}
+              {:else}
+                 <h4 class="msg-content">{message.message}</h4>
+            {/if}
           </div>
         </div><br />
         <!-- end of single message div -->
@@ -329,6 +345,27 @@
                 src={message.message}
                 alt={message.sender} />
             </a>
+          </div>
+        </div><br />
+        <!-- end of single message div -->
+      {/if}
+      {#if message.type == 'code'}
+        <!-- single message div -->
+        <div class="msg">
+          <div class="message-inline">
+            <img
+              src="https://github.com/{message.sender}.png"
+              alt={message.sender}
+              class="msg-img" />
+            <h3 class="dm-name">
+              {message.sender}
+              <span class="date">{dateToString(new Date(message.date))}</span>
+            </h3>
+          </div>
+          <div class="msg-container">
+            <div class="code">
+              {message.message}
+            </div>
           </div>
         </div><br />
         <!-- end of single message div -->

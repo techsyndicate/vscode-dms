@@ -99,6 +99,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			message: code,
 			conversation_id: conversation_id,
 		}))
+		vscode.window.showInformationMessage('Your code snippet has been sent.')
 	})
 
 	socket.on("connect", async () => {
