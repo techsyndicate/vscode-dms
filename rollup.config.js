@@ -12,7 +12,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const production = !process.env.ROLLUP_WATCH;
-console.log(`API KEY using dotenv module in rollup config: ${process.env.API_KEY}`);
 
 export default fs
   .readdirSync(path.join(__dirname, "svelte", "pages"))
