@@ -18,7 +18,8 @@
     date: date,
     type: "text",
     message: "",
-    conversation_id: "",
+    conversation_id: conversation_id,
+    group: true
   };
 
   let firebaseConfig = {
@@ -40,13 +41,9 @@
       );
     });
     socket.emit("status", { user: accessToken, status: 'online'})
-  };
-
-  const getStatus = async () => {
-    const res = await axios.get(
-      `${apiBaseUrl}/api/users/${message.receiver}/status?access_token=${accessToken}`
-    );
-    return res.data.status;
+    socket.on('connection', socket => {
+      socket.join(conversation_id);
+    });
   };
 
   const getSenderUsername = async () => {
@@ -58,7 +55,7 @@
 
   const getMessages = async () => {
     const res = await axios.get(
-      `${apiBaseUrl}/api/messages/${message.receiver}?access_token=${accessToken}`
+      `${apiBaseUrl}/api/messages/group${message.conversation_id}?access_token=${accessToken}`
     );
     const messages = res.data;
     for (let i = 0; i < messages.length; i++) {
@@ -193,12 +190,6 @@
   onMount(async () => {
     await getSenderUsername();
     await sendSocketId();
-    if (message.sender < message.receiver) {
-      message.conversation_id = `${message.sender}${message.receiver}`;
-    } else {
-      message.conversation_id = `${message.receiver}${message.sender}`;
-    }
-    status = await getStatus();
     finalMessages = await getMessages();
     const messageInputBox = document.getElementById("message-input");
     messageInputBox.click();

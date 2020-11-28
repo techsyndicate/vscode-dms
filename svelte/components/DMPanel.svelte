@@ -20,6 +20,7 @@
     type: "text",
     message: "",
     conversation_id: "",
+    group: false
   };
 
   let firebaseConfig = {

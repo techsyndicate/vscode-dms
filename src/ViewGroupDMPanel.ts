@@ -202,6 +202,7 @@ export class ViewGroupDMPanel {
             const membersString = "${membersString}"
             const nonce = "${nonce}"
             const socket = io.connect(apiBaseUrl);
+            const conversation_id = "${this._group.conversation_id}"
         </script>
             <title>${this._group.name}</title>
 			</head>
