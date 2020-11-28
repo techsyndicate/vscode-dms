@@ -100,6 +100,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			conversation_id: conversation_id,
 		}))
 		vscode.window.showInformationMessage('Your code snippet has been sent.')
+		vscode.commands.executeCommand("workbench.action.webview.reloadWebviewAction")
 	})
 
 	socket.on("connect", async () => {
