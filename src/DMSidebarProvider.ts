@@ -4,6 +4,7 @@ import { getNonce } from "./getNonce";
 import { Util } from './util'
 import { ViewDMPanel } from "./ViewDMPanel";
 import { createGroupDM } from './createGroupDM'
+import { ViewGroupDMPanel } from './ViewGroupDMPanel'
 
 let user:string = '';
 let fileName:string = 'sidebar';
@@ -48,6 +49,13 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
         case "onCreateDMPress": {
           createGroupDM.createOrShow(this._extensionUri)
           break
+        }
+        case "onGroupPress": {
+          if (!data.value) {
+            return;
+          }
+          ViewGroupDMPanel.createOrShow(this._extensionUri, data.value, this.socketID)
+          break;
         }
       }
     });

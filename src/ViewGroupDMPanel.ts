@@ -2,35 +2,39 @@ import * as vscode from "vscode";
 import { apiBaseUrl } from "./constants";
 import { getNonce } from "./getNonce";
 import { Util } from "./util";
-import axios from "axios";
+import axios from 'axios';
 
-export class createGroupDM {
+export class ViewGroupDMPanel {
   /**
    * Track the currently panel. Only allow a single panel to exist at a time.
    */
-  public static currentPanel: createGroupDM | undefined;
+  public static currentPanel: ViewGroupDMPanel | undefined;
 
-  public static readonly viewType = "createDM";
+  public static readonly viewType = "viewGroupDM";
 
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionUri: vscode.Uri;
+  private _group: any;
+  private _socketID: any;
   private _disposables: vscode.Disposable[] = [];
 
-  public static createOrShow(extensionUri: vscode.Uri) {
+  public static createOrShow(extensionUri: vscode.Uri, group: any, socketID: any) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
       : undefined;
 
     // If we already have a panel, show it.
-    if (createGroupDM.currentPanel) {
-      createGroupDM.currentPanel._panel.reveal(column);
-      createGroupDM.currentPanel._update();
+    if (ViewGroupDMPanel.currentPanel) {
+      ViewGroupDMPanel.currentPanel._panel.reveal(column);
+      ViewGroupDMPanel.currentPanel._group = group;
+      ViewGroupDMPanel.currentPanel._socketID = socketID;
+      ViewGroupDMPanel.currentPanel._update();
       return;
     }
 
     // Otherwise, create a new panel.
     const panel = vscode.window.createWebviewPanel(
-      createGroupDM.viewType, 'Create Group DM',
+      ViewGroupDMPanel.viewType, 'Chat',
       column || vscode.ViewColumn.One,
       {
         // Enable javascript in the webview
@@ -44,28 +48,38 @@ export class createGroupDM {
       }
     );
 
-    createGroupDM.currentPanel = new createGroupDM(
+    ViewGroupDMPanel.currentPanel = new ViewGroupDMPanel(
       panel,
-      extensionUri
+      extensionUri,
+      group,
+      socketID
     );
   }
 
   public static revive(
     panel: vscode.WebviewPanel,
-    extensionUri: vscode.Uri
+    extensionUri: vscode.Uri,
+    group: any,
+    socketID: string
   ) {
-    createGroupDM.currentPanel = new createGroupDM(
+    ViewGroupDMPanel.currentPanel = new ViewGroupDMPanel(
       panel,
-      extensionUri
+      extensionUri,
+      group,
+      socketID
     );
   }
 
   private constructor(
     panel: vscode.WebviewPanel,
-    extensionUri: vscode.Uri
+    extensionUri: vscode.Uri,
+    group: string,
+    socketID: string
   ) {
     this._panel = panel;
     this._extensionUri = extensionUri;
+    this._group = group;
+    this._socketID = socketID;
 
     // Set the webview's initial html content
     this._update();
@@ -76,7 +90,7 @@ export class createGroupDM {
   }
 
   public dispose() {
-    createGroupDM.currentPanel = undefined;
+    ViewGroupDMPanel.currentPanel = undefined;
 
     // Clean up our resources
     this._panel.dispose();
@@ -95,21 +109,16 @@ export class createGroupDM {
     this._panel.webview.html = this._getHtmlForWebview(webview);
     webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
-        case "formSubmission": {  
-          console.log('code reaches here')
-          axios.post(`${apiBaseUrl}/api/groups/create?access_token=${Util.getAccessToken()}`, data.value)
-          .then(response => {
-             console.log('code reaches here 2')
-             console.log(response.data)
-             vscode.window.showInformationMessage(`${data.value.name} successfully created`);
-             vscode.commands.executeCommand("vscode-dms.refresh")
-             vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-          })
-          .catch(err => {
-              console.log(err)
-              vscode.window.showErrorMessage(`${err}`)
-              vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-          })
+        case "notificationMessage": {
+          vscode.window.showInformationMessage(data.value.sender + ': ' + data.value.message);
+          console.log(data.value);
+          console.log(data.value.message);
+          break;
+        }   
+        case "close": {
+          await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${this._socketID}`);
+          vscode.window.showInformationMessage('You will now recieve notifications while working');
+          vscode.commands.executeCommand("workbench.action.closeActiveEditor");
           break;
         }
       }
@@ -119,7 +128,11 @@ export class createGroupDM {
   private _getHtmlForWebview(webview: vscode.Webview) {
     // // And the uri we use to load this script in the webview
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/createGroupDM.js")
+      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/grpdmpanel.js")
+    );
+
+    const receiveSocketUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "media", "receiveSocket.js")
     );
 
     // Local path to css styles
@@ -135,23 +148,33 @@ export class createGroupDM {
       "vscode.css"
     );
 
-    const stylescreateGroupDMPath = vscode.Uri.joinPath(
+    const stylesGroupDMPanelPath = vscode.Uri.joinPath(
       this._extensionUri,
       "media",
-      "createGroupDM.css"
+      "dmpanel.css"
     );
 
     // Uri to load styles into webview
     const stylesResetUri = webview.asWebviewUri(styleResetPath);
     const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
-    const stylecreateGroupDMUri = webview.asWebviewUri(stylescreateGroupDMPath);
+    const styleGroupDMPanelUri = webview.asWebviewUri(stylesGroupDMPanelPath);
     const cssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/createGroupDM.css")
+      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/grpdmpanel.css")
     );
 
 
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
+    let membersString = ''
+    const membersArray = this._group.members
+    for(let i=0; i< membersArray.length; i++) {
+      if(i == membersArray.length-1) {
+        membersString += `${membersArray[i]}`
+      }
+      else {
+        membersString += `${membersArray[i]}, `
+      }
+    }
 
     return `<!DOCTYPE html>
 			<html lang="en">
@@ -166,16 +189,21 @@ export class createGroupDM {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${stylesResetUri}" rel="stylesheet">
         <link href="${stylesMainUri}" rel="stylesheet">
-        <link href="${stylecreateGroupDMUri}" rel="stylesheet">
+        <link href="${styleGroupDMPanelUri}" rel="stylesheet">
         <link href="${cssUri}" rel="stylesheet">
         <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
+        <script nonce="${nonce}" src="${receiveSocketUri}"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();
             const accessToken = "${Util.getAccessToken()}"
+            const groupName = "${this._group.name}"
+            const imageUrl = "${this._group.avatar_url}"
+            const membersString = "${membersString}"
             const nonce = "${nonce}"
             const socket = io.connect(apiBaseUrl);
         </script>
+            <title>${this._group.name}</title>
 			</head>
       <body>
       </body>

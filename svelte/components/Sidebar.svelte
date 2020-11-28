@@ -3,13 +3,13 @@
     import axios from 'axios'
 
     let loadingState: "initial" | "more" | "refetch" | "ready" = "initial";
-    let users = [];
+    let contacts = [];
     let error = null;
     
     const fetchData = async () => { 
       try {
-        const res = await axios.get(`${apiBaseUrl}/api/users/contacts?access_token=${accessToken}`);
-        users = res.data;
+        const res = await axios.get(`${apiBaseUrl}/api/contacts?access_token=${accessToken}`);
+        contacts = res.data;
       } catch (err) {
         error = err.message
       }
@@ -72,21 +72,32 @@
     <p>Error: {error.message}</p>
   {/if}
     <div class="inline">
-      <h2>Contacts ({users.length})</h2>
+      <h2>Contacts ({contacts.length})</h2>
     <div title="Create Group DM" on:click="{() => {
       tsvscode.postMessage({ type: 'onCreateDMPress' });
     }}"><img class="add-button" src="https://www.downloadclipart.net/large/19773-add-button-white-design.png" alt="add-button"></div>
     </div>
     <br>
-    {#each users as user}
-    <div class="contact-card" on:click={() => {
-      tsvscode.postMessage({ type: 'onContactPress', value: user });
-    }}>
-      <div class="inline">
-        <img class="contact-img" src="{user.avatar_url}" alt="{user.username}"/>
-        <h3 class="contact-name">{user.username}</h3>
-      </div>
-    </div><br>
+    {#each contacts as contact}
+      {#if contact.type == "group"}
+          <div class="contact-card" on:click={() => {
+            tsvscode.postMessage({ type: 'onGroupPress', value: contact });
+          }}>
+            <div class="inline">
+              <img class="contact-img" src="{contact.avatar_url}" alt="{contact.name}"/>
+              <h3 class="contact-name">{contact.name}</h3>
+            </div>
+          </div><br>
+      {:else}
+          <div class="contact-card" on:click={() => {
+            tsvscode.postMessage({ type: 'onContactPress', value: contact });
+          }}>
+            <div class="inline">
+              <img class="contact-img" src="{contact.avatar_url}" alt="{contact.username}"/>
+              <h3 class="contact-name">{contact.username}</h3>
+            </div>
+          </div><br>
+      {/if}
     {:else}
       <p>loading..</p>
 	  {/each}
