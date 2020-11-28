@@ -3,6 +3,7 @@ import { apiBaseUrl } from "./constants";
 import { getNonce } from "./getNonce";
 import { Util } from './util'
 import { ViewDMPanel } from "./ViewDMPanel";
+import { createGroupDM } from './createGroupDM'
 
 let user:string = '';
 let fileName:string = 'sidebar';
@@ -43,6 +44,10 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
           }
           vscode.window.showErrorMessage(data.value);
           break;
+        }
+        case "onCreateDMPress": {
+          createGroupDM.createOrShow(this._extensionUri)
+          break
         }
       }
     });

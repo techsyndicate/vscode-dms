@@ -19,6 +19,16 @@
     onMount(async () => {
       await fetchData()
     });
+
+    window.addEventListener("message", async (event) => {
+    const message = event.data;
+    switch (message.command) {
+      case "refresh":
+        console.log('doing the refreshing..')
+        await fetchData();
+        break;
+    }
+  });
 </script>
 
 <style>
@@ -46,13 +56,28 @@
     flex-flow: row wrap;
     align-items: center;
   }
+  .add-button {
+    height: 20px;
+    width: 20px;
+    margin-left: 49px;
+    margin-top: 8px;
+  }
+  .add-button:hover {
+    cursor: pointer;
+  }
 </style>
 
 <main>
   {#if error}
     <p>Error: {error.message}</p>
   {/if}
-    <h2>Contacts ({users.length})</h2><br>
+    <div class="inline">
+      <h2>Contacts ({users.length})</h2>
+    <div title="Create Group DM" on:click="{() => {
+      tsvscode.postMessage({ type: 'onCreateDMPress' });
+    }}"><img class="add-button" src="https://www.downloadclipart.net/large/19773-add-button-white-design.png" alt="add-button"></div>
+    </div>
+    <br>
     {#each users as user}
     <div class="contact-card" on:click={() => {
       tsvscode.postMessage({ type: 'onContactPress', value: user });

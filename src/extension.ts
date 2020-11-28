@@ -109,6 +109,12 @@ export async function activate(context: vscode.ExtensionContext) {
 		context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider("dm-full", provider)
 		);
+		vscode.commands.registerCommand("vscode-dms.refresh", () => {
+			provider._view?.webview.postMessage({
+			  command: "refresh",
+			});
+		});
+		return
 	});
 }
 
