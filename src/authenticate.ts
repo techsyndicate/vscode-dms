@@ -52,6 +52,8 @@ export const authenticate = () => {
     `);
 
     (app as any).server.close();
+    
+    vscode.commands.executeCommand("workbench.action.reloadWindow")
 
     const panel = vscode.window.createWebviewPanel(
       'authSuccessful',
