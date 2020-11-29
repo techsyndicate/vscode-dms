@@ -89,12 +89,12 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (loginUser.data.last_group) {
 			socket.emit('send-message', JSON.stringify({
 				access_token: Util.getAccessToken(),
-				sender: loginUser.data.last_user,
-				receiver: 'code',
+				sender: loginUser.data.username,
+				receiver: loginUser.data.chat.last_user,
 				date: new Date(),
 				type: "code",
 				message: code,
-				conversation_id: loginUser.data.last_id,
+				conversation_id: loginUser.data.chat.last_id,
 				group: true
 			}))
 		} else {
