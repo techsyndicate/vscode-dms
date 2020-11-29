@@ -77,7 +77,7 @@ async function initSocket() {
                 messagesArea.innerHTML = messagesArea.innerHTML + codeInflator(msg);
             }
             window.scrollTo(0, document.body.scrollHeight);
-        } else if (msg.sender == name) {
+        } else if (!msg.group && msg.sender == name) {
             if (msg.type == "text") {
                 messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
             }
@@ -88,7 +88,7 @@ async function initSocket() {
                 messagesArea.innerHTML = messagesArea.innerHTML + codeInflator(msg);
             }
             window.scrollTo(0, document.body.scrollHeight);
-        } else {
+        } else if (msg.sender != clientUsername) {
             tsvscode.postMessage({ type: 'notificationMessage', value: msg });
         }
     });

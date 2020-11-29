@@ -37,10 +37,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	await sendSocketId()
 
-    socket.on("receive-message", (msg: { sender: string; message: string; receiver: string; group: boolean }) => {
+    socket.on("receive-message", async (msg: { sender: string; message: string; receiver: string; group: boolean }) => {
 		console.log(msg)
 		if (msg.group && msg.sender != loginUser.username) {
-            vscode.window.showInformationMessage(msg.receiver + ': ' + msg.sender + ': '+ msg.message)
+			vscode.window.showInformationMessage(msg.receiver + ': ' + msg.sender + ': '+ msg.message)
         } else if (msg.receiver == loginUser.username) {
 			vscode.window.showInformationMessage(msg.sender + ': '+ msg.message)
         }
