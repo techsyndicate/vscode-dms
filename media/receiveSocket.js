@@ -73,6 +73,7 @@ async function initSocket() {
                 messagesArea.innerHTML = messagesArea.innerHTML + imageInflator(msg);
             }
             if (msg.type == "code") {
+                msg.message = msg.message.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"')
                 messagesArea.innerHTML = messagesArea.innerHTML + codeInflator(msg);
             }
             window.scrollTo(0, document.body.scrollHeight);
