@@ -41,9 +41,6 @@
       );
     });
     socket.emit("status", { user: accessToken, status: 'online'})
-    socket.on('connection', socket => {
-      socket.join(conversation_id);
-    });
   };
 
   const getSenderUsername = async () => {

@@ -191,11 +191,13 @@ export class ViewGroupDMPanel {
         <link href="${styleGroupDMPanelUri}" rel="stylesheet">
         <link href="${cssUri}" rel="stylesheet">
         <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
+        <script nonce="${nonce}" src="${receiveSocketUri}"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();
             const accessToken = "${Util.getAccessToken()}"
             const groupName = "${this._group.name}"
+            const name = groupName
             const imageUrl = "${this._group.avatar_url}"
             const membersString = "${membersString}"
             const nonce = "${nonce}"
@@ -203,7 +205,6 @@ export class ViewGroupDMPanel {
             const socket = io.connect(apiBaseUrl);
             const conversation_id = "${this._group.conversation_id}"
         </script>
-        <script nonce="${nonce}" src="${receiveSocketUri}"></script>
             <title>${this._group.name}</title>
 			</head>
       <body>

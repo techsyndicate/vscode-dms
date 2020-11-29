@@ -65,7 +65,7 @@ async function initSocket() {
     }
 
     socket.on("receive-message", msg => {
-        if (msg.group && msg.receiver == groupName && msg.sender != clientUsername) {
+        if (msg.group && msg.receiver == name && msg.sender != clientUsername) {
             console.log(msg.sender, clientUsername, msg.message)
             if (msg.type == "text") {
                 messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
@@ -77,7 +77,7 @@ async function initSocket() {
                 messagesArea.innerHTML = messagesArea.innerHTML + codeInflator(msg);
             }
             window.scrollTo(0, document.body.scrollHeight);
-        } else if (msg.sender == username) {
+        } else if (msg.sender == name) {
             if (msg.type == "text") {
                 messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
             }

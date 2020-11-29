@@ -188,6 +188,7 @@ export class ViewDMPanel {
             const tsvscode = acquireVsCodeApi();
             const accessToken = "${Util.getAccessToken()}"
             const username = "${this._user.username}"
+            const name = username
             const imageUrl = "${this._user.avatar_url}"
             const nonce = "${nonce}"
             const socket = io.connect(apiBaseUrl);
