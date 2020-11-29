@@ -121,6 +121,33 @@ export class ViewGroupDMPanel {
           vscode.commands.executeCommand("workbench.action.closeActiveEditor");
           break;
         }
+        case "delete": {
+          console.log(data.value.conversation_id)
+          console.log(data.value.clientUsername)
+          console.log(data.value.adminUsername)
+          if(data.value.clientUsername != data.value.adminUsername) {
+            vscode.window.showErrorMessage('Only the admin can delete the group');
+            break
+          }
+          else {
+            const choice = await vscode.window.showInformationMessage(
+              "Are u sure you want to delete the group?",
+              "Yes",
+              "Cancel"
+            );
+            if (choice === "Yes") {
+              const url = `${apiBaseUrl}/api/groups/delete?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`
+              console.log(url)
+              await axios.get(url)
+              vscode.commands.executeCommand("vscode-dms.refresh")
+              vscode.window.showInformationMessage('Successfully deleted');
+              vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+            } else {
+              break
+            }
+          }
+          break;
+        }
       }
     });
   }
@@ -204,6 +231,7 @@ export class ViewGroupDMPanel {
             let clientUsername = "";
             const socket = io.connect(apiBaseUrl);
             const conversation_id = "${this._group.conversation_id}"
+            const adminUsername = "${this._group.admin}"
         </script>
             <title>${this._group.name}</title>
 			</head>

@@ -240,6 +240,7 @@
         title="Close this tab and continue receiving notifications while you're working">
         <svg
           class="notif-icon"
+          id="notif-icon"
           on:click={() => {
             tsvscode.postMessage({ type: 'close' });
           }}
@@ -287,6 +288,15 @@
             <g xmlns="http://www.w3.org/2000/svg" />
           </g></svg>
       </div>
+        <div
+        title="Delete group"
+        id="delete-group"
+        on:click="{() => {
+          tsvscode.postMessage({ type: 'delete', value: { conversation_id: conversation_id, clientUsername: clientUsername, adminUsername: adminUsername } });
+        }}"
+        >
+          <img src="https://cdn.discordapp.com/attachments/767769692001402910/782661973631827988/delete.svg" alt="delete-icon" class="delete-icon"/>
+        </div>
     </div>
     <h4 class="dm-status" id="dm-status">{membersString}</h4>
   </div>

@@ -33,9 +33,15 @@
 
 <style>
   .contact-card {
-    height: 40px;
+    width: 219.5px;
+    height: 60px;
     border-style: solid;
     border: none;
+    margin-bottom: -20px;
+    padding-top: 10px;
+    padding-left: 20px;
+    margin-left: -20px;
+    overflow-x: hidden;
   }
   .contact-card:hover {
     background-color: #252526;

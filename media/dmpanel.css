@@ -120,7 +120,23 @@
     right: 15px;
 }
 
+#notif-icon {
+    right: 60px;
+}
+
+.delete-icon {
+    height: 22px;
+    width: 22px;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+}
+
 .notif-icon:hover {
+    cursor: pointer
+}
+
+.delete-icon:hover {
     cursor: pointer
 }
 
