@@ -50,6 +50,10 @@
   }
   .contact-name {
     margin-left: 15px;
+    width: 16ch;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .inline {
     display: flex;
@@ -59,7 +63,7 @@
   .add-button {
     height: 20px;
     width: 20px;
-    margin-left: 49px;
+    margin-left: 40px;
     margin-top: 8px;
   }
   .add-button:hover {
