@@ -112,6 +112,7 @@
 		"@types/polka": "^0.5.1",
 		"@types/socket.io-client": "^1.4.34",
 		"axios": "^0.21.0",
+		"cache-base": "^4.0.0",
 		"circular-json": "^0.5.9",
 		"dotenv": "^8.2.0",
 		"firebase": "^8.1.1",
@@ -121,6 +122,7 @@
 		"jquery": "^3.5.1",
 		"node-fetch": "^2.6.1",
 		"polka": "^0.5.2",
-		"socket.io-client": "^3.0.2"
+		"socket.io-client": "^3.0.2",
+		"vscode-cache": "^0.3.0"
 	}
 }

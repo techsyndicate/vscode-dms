@@ -1,50 +1,50 @@
 import * as vscode from 'vscode';
-import { authenticate } from "./authenticate"
+import { authenticate } from "./authenticate";
 import { DMSidebarProvider } from "./DMSidebarProvider";
-import { Util } from "./util"
-import { apiBaseUrl } from './constants'
-const io = require("socket.io-client")
-import axios from 'axios'
+import { Util } from "./util";
+import { apiBaseUrl } from './constants';
+const io = require("socket.io-client");
+import axios from 'axios';
 
 export async function activate(context: vscode.ExtensionContext) {
 	Util.context = context;
-	if(!Util.isLoggedIn()) {
+	if (!Util.isLoggedIn()) {
 		const choice = await vscode.window.showInformationMessage(
 			`You need to login to GitHub to start messaging, would you like to continue?`,
 			"Yes",
 			"Cancel"
 		);
 		if (choice === "Yes") {
-			authenticate()
+			authenticate();
 		}
 	}
 	console.log('yoz! vscode-dms is active.');
 
-	let res = await axios.get(`${apiBaseUrl}/api/users?access_token=${Util.getAccessToken()}`)
-	let loginUser = res.data
+	let res = await axios.get(`${apiBaseUrl}/api/users?access_token=${Util.getAccessToken()}`);
+	let loginUser = res.data;
 
 	const socket = io.connect(apiBaseUrl);
-	console.log(socket)
-	console.log('socket initialized')
+	console.log(socket);
+	console.log('socket initialized');
 
 	const sendSocketId = async () => {
 		socket.on("connect", async () => {
-		  await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${socket.id}`
-		  );
+			await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${socket.id}`
+			);
 		});
-		socket.emit("status", { user: Util.getAccessToken(), status: 'online'})
+		socket.emit("status", { user: Util.getAccessToken(), status: 'online' });
 	};
 
-	await sendSocketId()
+	await sendSocketId();
 
-    socket.on("receive-message", async (msg: { sender: string; message: string; receiver: string; group: boolean }) => {
-		console.log(msg)
+	socket.on("receive-message", async (msg: { sender: string; message: string; receiver: string; group: boolean }) => {
+		console.log(msg);
 		if (msg.group && msg.sender != loginUser.username) {
-			vscode.window.showInformationMessage(msg.receiver + ': ' + msg.sender + ': '+ msg.message)
-        } else if (msg.receiver == loginUser.username) {
-			vscode.window.showInformationMessage(msg.sender + ': '+ msg.message)
-        }
-    });
+			vscode.window.showInformationMessage(msg.receiver + ': ' + msg.sender + ': ' + msg.message);
+		} else if (msg.receiver == loginUser.username) {
+			vscode.window.showInformationMessage(msg.sender + ': ' + msg.message);
+		}
+	});
 
 	vscode.commands.registerCommand('vscode-dms.info', () => {
 		const panel = vscode.window.createWebviewPanel(
@@ -52,9 +52,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			'Information',
 			vscode.ViewColumn.One,
 			{}
-		  );
+		);
 		panel.webview.html = getWebviewContent();
-	})
+	});
 
 	function getWebviewContent() {
 		return `<!DOCTYPE html>
@@ -80,10 +80,10 @@ export async function activate(context: vscode.ExtensionContext) {
 	  </html>`;
 	}
 
-	vscode.commands.registerCommand('vscode-dms.sendMessage', async() => {
+	vscode.commands.registerCommand('vscode-dms.sendMessage', async () => {
 		const editor = vscode.window.activeTextEditor;
 		const selection = editor && editor.selection;
-		let code = editor?.document.getText(selection)
+		let code = editor?.document.getText(selection);
 		// code is the code that is selected
 		let loginUser = await axios.get(`${apiBaseUrl}/api/users?access_token=${Util.getAccessToken()}`)
 		if (loginUser.data.chat.last_group) {
@@ -96,9 +96,9 @@ export async function activate(context: vscode.ExtensionContext) {
 				message: code,
 				conversation_id: loginUser.data.chat.last_id,
 				group: true
-			}))
+			}));
 		} else {
-			let conversation_id = ""
+			let conversation_id = "";
 			if (loginUser.data.username < loginUser.data.chat.last_user) {
 				conversation_id = `${loginUser.data.username}${loginUser.data.chat.last_user}`;
 			} else {
@@ -114,26 +114,26 @@ export async function activate(context: vscode.ExtensionContext) {
 				message: code,
 				conversation_id: conversation_id,
 				group: false
-			}))
+			}));
 		}
 		vscode.window.showInformationMessage('Your code snippet has been sent.')
 		vscode.commands.executeCommand("workbench.action.webview.reloadWebviewAction")
-	})
+	});
 
 	socket.on("connect", async () => {
-		const socketID = await socket.id
-		const provider = new DMSidebarProvider(context.extensionUri, socketID);
+		const socketID = await socket.id;
+		const provider = new DMSidebarProvider(context.extensionUri, socketID, context);
 		context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider("dm-full", provider)
+			vscode.window.registerWebviewViewProvider("dm-full", provider)
 		);
 		vscode.commands.registerCommand("vscode-dms.refresh", () => {
 			provider._view?.webview.postMessage({
-			  command: "refresh",
+				command: "refresh",
 			});
 		});
-		return
+		return;
 	});
 }
 
 
-export function deactivate() {}
+export function deactivate() { }

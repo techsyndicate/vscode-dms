@@ -237,7 +237,7 @@
     }
   }
 
-  // inflate images when using Ctrl + V
+  // inflate images when using clipboard
   function firebaseImageInflator(message) {
     date = dateToString(new Date(message.date));
     return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><a href="${message.message}"><img class="image-content" src="${message.message}"></a></div><br>`;

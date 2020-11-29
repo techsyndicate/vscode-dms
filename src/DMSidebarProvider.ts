@@ -1,19 +1,19 @@
 import * as vscode from "vscode";
 import { apiBaseUrl } from "./constants";
 import { getNonce } from "./getNonce";
-import { Util } from './util'
+import { Util } from "./util";
 import { ViewDMPanel } from "./ViewDMPanel";
-import { createGroupDM } from './createGroupDM'
-import { ViewGroupDMPanel } from './ViewGroupDMPanel'
+import { createGroupDM } from './createGroupDM';
+import { ViewGroupDMPanel } from './ViewGroupDMPanel';
 
-let user:string = '';
-let fileName:string = 'sidebar';
+let user: string = '';
+let fileName: string = 'sidebar';
 
 export class DMSidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
   _doc?: vscode.TextDocument;
 
-  constructor(private readonly _extensionUri: vscode.Uri, private readonly socketID: any) {}
+  constructor(private readonly _extensionUri: vscode.Uri, private readonly socketID: any, private readonly _extensionContext: vscode.ExtensionContext) { }
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -28,7 +28,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [this._extensionUri],
     };
 
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, this._extensionContext);
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
@@ -36,7 +36,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
           if (!data.value) {
             return;
           }
-          ViewDMPanel.createOrShow(this._extensionUri, data.value, this.socketID)
+          ViewDMPanel.createOrShow(this._extensionUri, data.value, this.socketID);
           break;
         }
         case "onError": {
@@ -47,21 +47,21 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "onCreateDMPress": {
-          createGroupDM.createOrShow(this._extensionUri)
-          break
+          createGroupDM.createOrShow(this._extensionUri);
+          break;
         }
         case "onGroupPress": {
           if (!data.value) {
             return;
           }
-          ViewGroupDMPanel.createOrShow(this._extensionUri, data.value, this.socketID)
+          ViewGroupDMPanel.createOrShow(this._extensionUri, data.value, this.socketID);
           break;
         }
       }
     });
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview) {
+  private _getHtmlForWebview(webview: vscode.Webview, extensionContext: vscode.ExtensionContext) {
     const styleResetUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "media", "reset.css")
     );
@@ -81,13 +81,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
 			<html lang="en">
 			<head>
 				<meta charset="UTF-8">
-				<!--
-					Use a content security policy to only allow loading images from https or from our extension directory,
-					and only allow scripts that have a specific nonce.
-        -->
-        <meta http-equiv="Content-Security-Policy" content="default-src ${apiBaseUrl}; img-src https: data:; style-src ${
-      webview.cspSource
-    }; script-src 'nonce-${nonce}';">
+        <meta http-equiv="Content-Security-Policy" content="default-src ${apiBaseUrl}; img-src https: data:; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${styleResetUri}" rel="stylesheet">
 				<link href="${styleVSCodeUri}" rel="stylesheet">

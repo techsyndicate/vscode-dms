@@ -1,30 +1,46 @@
 <script lang="ts">
-		import { onMount } from 'svelte';
-    import axios from 'axios'
+  import { onMount } from "svelte";
+  import axios from "axios";
+  import CacheBase from "cache-base";
 
-    let loadingState: "initial" | "more" | "refetch" | "ready" = "initial";
-    let contacts = [];
-    let error = null;
-    
-    const fetchData = async () => { 
-      try {
-        const res = await axios.get(`${apiBaseUrl}/api/contacts?access_token=${accessToken}`);
-        contacts = res.data;
-      } catch (err) {
-        error = err.message
-      }
-      loadingState = "ready";
-     }
+  const extensionCache = new CacheBase();
 
-    onMount(async () => {
-      await fetchData()
-    });
+  let loadingState: "initial" | "more" | "refetch" | "ready" = "initial";
+  let contacts = [];
+  let error = null;
 
-    window.addEventListener("message", async (event) => {
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(`${apiBaseUrl}/api/contacts?access_token=${accessToken}`);
+      const resContacts = res.data;
+      return resContacts;
+    } catch (err) {
+      error = err.message;
+    }
+    loadingState = "ready";
+  };
+
+  let loadFromCache = false;
+
+  onMount(async () => {
+    if (!loadFromCache) {
+      const resContacts = await fetchData();
+      extensionCache.set('contacts', resContacts);
+      contacts = resContacts;
+      console.log('api');
+      loadFromCache = true;
+    } else {
+      const cachedContacts = extensionCache['cache']['contacts'];
+      contacts = cachedContacts;
+      console.log('cache');
+    }
+  });
+
+  window.addEventListener("message", async (event) => {
     const message = event.data;
     switch (message.command) {
       case "refresh":
-        console.log('doing the refreshing..')
+        console.log("doing the refreshing..");
         await fetchData();
         break;
     }
@@ -75,34 +91,51 @@
   {#if error}
     <p>Error: {error.message}</p>
   {/if}
-    <div class="inline">
-      <h2>Contacts ({contacts.length})</h2>
-    <div title="Create Group DM" on:click="{() => {
-      tsvscode.postMessage({ type: 'onCreateDMPress' });
-    }}"><img class="add-button" src="https://www.downloadclipart.net/large/19773-add-button-white-design.png" alt="add-button"></div>
+  <div class="inline">
+    <h2>Contacts ({contacts.length})</h2>
+    <div
+      title="Create Group DM"
+      on:click={() => {
+        tsvscode.postMessage({ type: 'onCreateDMPress' });
+      }}>
+      <img
+        class="add-button"
+        src="https://www.downloadclipart.net/large/19773-add-button-white-design.png"
+        alt="add-button" />
     </div>
-    <br>
-    {#each contacts as contact}
-      {#if contact.type == "group"}
-          <div class="contact-card" on:click={() => {
-            tsvscode.postMessage({ type: 'onGroupPress', value: contact });
-          }}>
-            <div class="inline">
-              <img class="contact-img" src="{contact.avatar_url}" alt="{contact.name}"/>
-              <h3 class="contact-name">{contact.name}</h3>
-            </div>
-          </div><br>
-      {:else}
-          <div class="contact-card" on:click={() => {
-            tsvscode.postMessage({ type: 'onContactPress', value: contact });
-          }}>
-            <div class="inline">
-              <img class="contact-img" src="{contact.avatar_url}" alt="{contact.username}"/>
-              <h3 class="contact-name">{contact.username}</h3>
-            </div>
-          </div><br>
-      {/if}
+  </div>
+  <br />
+  {#each contacts as contact}
+    {#if contact.type == 'group'}
+      <div
+        class="contact-card"
+        on:click={() => {
+          tsvscode.postMessage({ type: 'onGroupPress', value: contact });
+        }}>
+        <div class="inline">
+          <img
+            class="contact-img"
+            src={contact.avatar_url}
+            alt={contact.name} />
+          <h3 class="contact-name">{contact.name}</h3>
+        </div>
+      </div><br />
     {:else}
-      <p>loading..</p>
-	  {/each}
+      <div
+        class="contact-card"
+        on:click={() => {
+          tsvscode.postMessage({ type: 'onContactPress', value: contact });
+        }}>
+        <div class="inline">
+          <img
+            class="contact-img"
+            src={contact.avatar_url}
+            alt={contact.username} />
+          <h3 class="contact-name">{contact.username}</h3>
+        </div>
+      </div><br />
+    {/if}
+  {:else}
+    <p>loading..</p>
+  {/each}
 </main>
