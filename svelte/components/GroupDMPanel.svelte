@@ -51,6 +51,7 @@
       `${apiBaseUrl}/api/users?access_token=${accessToken}`
     );
     message.sender = res.data.username;
+    clientUsername = res.data.username;
   };
 
   const getMessages = async () => {

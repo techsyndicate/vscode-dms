@@ -38,7 +38,7 @@ async function initSocket() {
     }
 
     function messageInflator(message) {
-        date = dateToString(message.date);
+        date = dateToString(new Date(message.date));
         if (isUrl(message.message)) {
             if (isImageUrl(message.message)) {
                 // render the image
@@ -64,7 +64,19 @@ async function initSocket() {
     }
 
     socket.on("receive-message", msg => {
-        if (msg.sender == username || msg.group == true) {
+        if (msg.group && msg.receiver == groupName && msg.sender != clientUsername) {
+            console.log(msg.sender, clientUsername, msg.message)
+            if (msg.type == "text") {
+                messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
+            }
+            if (msg.type == "image") {
+                messagesArea.innerHTML = messagesArea.innerHTML + imageInflator(msg);
+            }
+            if (msg.type == "code") {
+                messagesArea.innerHTML = messagesArea.innerHTML + codeInflator(msg);
+            }
+            window.scrollTo(0, document.body.scrollHeight);
+        } else if (msg.sender == username) {
             if (msg.type == "text") {
                 messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
             }

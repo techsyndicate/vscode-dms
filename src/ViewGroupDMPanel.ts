@@ -162,7 +162,6 @@ export class ViewGroupDMPanel {
       vscode.Uri.joinPath(this._extensionUri, "out", "compiled/grpdmpanel.css")
     );
 
-
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
     let membersString = ''
@@ -192,7 +191,6 @@ export class ViewGroupDMPanel {
         <link href="${styleGroupDMPanelUri}" rel="stylesheet">
         <link href="${cssUri}" rel="stylesheet">
         <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
-        <script nonce="${nonce}" src="${receiveSocketUri}"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const tsvscode = acquireVsCodeApi();
@@ -201,9 +199,11 @@ export class ViewGroupDMPanel {
             const imageUrl = "${this._group.avatar_url}"
             const membersString = "${membersString}"
             const nonce = "${nonce}"
+            let clientUsername = "";
             const socket = io.connect(apiBaseUrl);
             const conversation_id = "${this._group.conversation_id}"
         </script>
+        <script nonce="${nonce}" src="${receiveSocketUri}"></script>
             <title>${this._group.name}</title>
 			</head>
       <body>
