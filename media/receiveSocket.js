@@ -32,23 +32,23 @@ async function initSocket() {
         var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
         return regexp.test(s);
     }
-    
+
     function isImageUrl(url) {
-        return(url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+        return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
     }
-    
+
     function messageInflator(message) {
         date = dateToString(message.date);
         if (isUrl(message.message)) {
-        if (isImageUrl(message.message)) {
-            // render the image
-            return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><a href="${message.message}"><img class="image-content" src="${message.message}"></a></div><br>`;
+            if (isImageUrl(message.message)) {
+                // render the image
+                return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><a href="${message.message}"><img class="image-content" src="${message.message}"></a></div><br>`;
+            } else {
+                // hyperlink message
+                return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><a href="${message.message}" style="text-decoration: none;"><h4 class="msg-content">${message.message}</h4></a></div></div><br>`;
+            }
         } else {
-            // hyperlink message
-            return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><a href="${message.message}" style="text-decoration: none;"><h4 class="msg-content">${message.message}</h4></a></div></div><br>`;
-        }
-        } else {
-        // standard text message
+            // standard text message
             return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="msg-container"><h4 class="msg-content">${message.message}</h4></div></div><br>`;
         }
     }
@@ -64,7 +64,7 @@ async function initSocket() {
     }
 
     socket.on("receive-message", msg => {
-        if (msg.sender == username) {
+        if (msg.sender == username || msg.group == true) {
             if (msg.type == "text") {
                 messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
             }

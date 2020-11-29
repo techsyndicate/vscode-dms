@@ -55,7 +55,7 @@
 
   const getMessages = async () => {
     const res = await axios.get(
-      `${apiBaseUrl}/api/messages/group${message.conversation_id}?access_token=${accessToken}`
+      `${apiBaseUrl}/api/messages/group/${message.conversation_id}?access_token=${accessToken}`
     );
     const messages = res.data;
     for (let i = 0; i < messages.length; i++) {
