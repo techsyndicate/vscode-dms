@@ -95,6 +95,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				type: "code",
 				message: code,
 				conversation_id: loginUser.data.last_id,
+				group: true
 			}))
 		} else {
 			let conversation_id = ""
@@ -112,6 +113,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				type: "code",
 				message: code,
 				conversation_id: conversation_id,
+				group: false
 			}))
 		}
 		vscode.window.showInformationMessage('Your code snippet has been sent.')
