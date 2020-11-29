@@ -39,6 +39,7 @@ async function initSocket() {
 
     function messageInflator(message) {
         date = dateToString(new Date(message.date));
+        message.message = message.message.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"')
         if (isUrl(message.message)) {
             if (isImageUrl(message.message)) {
                 // render the image
