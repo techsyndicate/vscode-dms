@@ -86,22 +86,34 @@ export async function activate(context: vscode.ExtensionContext) {
 		let code = editor?.document.getText(selection)
 		// code is the code that is selected
 		let loginUser = await axios.get(`${apiBaseUrl}/api/users?access_token=${Util.getAccessToken()}`)
-		let conversation_id = ""
-		if (loginUser.data.username < loginUser.data.chat.last_user) {
-			conversation_id = `${loginUser.data.username}${loginUser.data.chat.last_user}`;
+		if (loginUser.data.last_group) {
+			socket.emit('send-message', JSON.stringify({
+				access_token: Util.getAccessToken(),
+				sender: loginUser.data.last_user,
+				receiver: 'code',
+				date: new Date(),
+				type: "code",
+				message: code,
+				conversation_id: loginUser.data.last_id,
+			}))
 		} else {
-			conversation_id = `${loginUser.data.chat.last_user}${loginUser.data.username}`;
+			let conversation_id = ""
+			if (loginUser.data.username < loginUser.data.chat.last_user) {
+				conversation_id = `${loginUser.data.username}${loginUser.data.chat.last_user}`;
+			} else {
+				conversation_id = `${loginUser.data.chat.last_user}${loginUser.data.username}`;
+			}
+			console.log(conversation_id)
+			socket.emit('send-message', JSON.stringify({
+				access_token: Util.getAccessToken(),
+				sender: loginUser.data.username,
+				receiver: loginUser.data.chat.last_user,
+				date: new Date(),
+				type: "code",
+				message: code,
+				conversation_id: conversation_id,
+			}))
 		}
-		console.log(conversation_id)
-		socket.emit('send-message', JSON.stringify({
-			access_token: Util.getAccessToken(),
-			sender: loginUser.data.username,
-			receiver: loginUser.data.chat.last_user,
-			date: new Date(),
-			type: "code",
-			message: code,
-			conversation_id: conversation_id,
-		}))
 		vscode.window.showInformationMessage('Your code snippet has been sent.')
 		vscode.commands.executeCommand("workbench.action.webview.reloadWebviewAction")
 	})

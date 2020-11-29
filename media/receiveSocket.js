@@ -60,6 +60,7 @@ async function initSocket() {
 
     function codeInflator(message) {
         date = dateToString(new Date(message.date))
+        message.message = message.message.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"')
         return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="code">${message.message}</div></div><br>`;
     }
 
@@ -73,7 +74,6 @@ async function initSocket() {
                 messagesArea.innerHTML = messagesArea.innerHTML + imageInflator(msg);
             }
             if (msg.type == "code") {
-                msg.message = msg.message.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"')
                 messagesArea.innerHTML = messagesArea.innerHTML + codeInflator(msg);
             }
             window.scrollTo(0, document.body.scrollHeight);
