@@ -86,7 +86,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		let code = editor?.document.getText(selection)
 		// code is the code that is selected
 		let loginUser = await axios.get(`${apiBaseUrl}/api/users?access_token=${Util.getAccessToken()}`)
-		if (loginUser.data.last_group) {
+		if (loginUser.data.chat.last_group) {
 			socket.emit('send-message', JSON.stringify({
 				access_token: Util.getAccessToken(),
 				sender: loginUser.data.username,
