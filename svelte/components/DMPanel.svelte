@@ -386,7 +386,7 @@
         <!-- end of single message div -->
       {/if}
     {:else}
-      <p>loading..</p>
+      <p id="loading">loading..</p>
     {/each}
   </div>
   <div class="input-box">
@@ -402,6 +402,10 @@
             message.date = date;
             message.type = 'text';
             socket.emit('send-message', JSON.stringify(message));
+            const loadingText = document.getElementById('loading')
+            if(loadingText != null) {
+              loadingText.innerHTML = ''
+            }
             const messagesArea = document.getElementById('messages-area');
             messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(message);
             document.sendMessage.reset();
