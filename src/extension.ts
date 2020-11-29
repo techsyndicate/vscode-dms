@@ -32,7 +32,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		  await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${socket.id}`
 		  );
 		});
-		socket.emit("status", { user: loginUser.username, status: 'online'})
+		socket.emit("status", { user: Util.getAccessToken(), status: 'online'})
 	};
 
 	await sendSocketId()
