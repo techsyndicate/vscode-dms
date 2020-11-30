@@ -110,15 +110,31 @@ export class ViewGroupDMPanel {
     webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
         case "notificationMessage": {
-          vscode.window.showInformationMessage(data.value.sender + ': ' + data.value.message);
+          if (data.value.group) {
+            vscode.window.showInformationMessage(data.value.receiver + ': ' + data.value.sender + ': ' + data.value.message);
+          } else {
+            vscode.window.showInformationMessage(data.value.sender + ': ' + data.value.message);
+          }
           console.log(data.value);
           console.log(data.value.message);
           break;
-        }   
+        }
+        case "refreshSidebar": {
+          vscode.commands.executeCommand("vscode-dms.refresh");
+          break;
+        }
         case "close": {
           await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${this._socketID}`);
           vscode.window.showInformationMessage('You will now recieve notifications while working');
           vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+          break;
+        }
+        case "sendUnread": {
+          try{
+            await axios.post(`${apiBaseUrl}/api/users/unread?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`)
+          } catch (err) {
+            console.log(err)
+          }
           break;
         }
         case "delete": {

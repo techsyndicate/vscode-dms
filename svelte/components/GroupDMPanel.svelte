@@ -34,6 +34,11 @@
 
   firebase.initializeApp(firebaseConfig);
 
+  const read = async () => {
+    await axios.post(`${apiBaseUrl}/api/users/read?access_token=${accessToken}&conversation_id=${conversation_id}`)
+    tsvscode.postMessage({type: "refreshSidebar"})
+  }
+
   const sendSocketId = async () => {
     socket.on("connect", async (data) => {
       await axios.get(
@@ -184,6 +189,7 @@
   );
 
   onMount(async () => {
+    await read();
     await getSenderUsername();
     await sendSocketId();
     finalMessages = await getMessages();

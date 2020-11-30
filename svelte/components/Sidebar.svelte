@@ -4,8 +4,26 @@
 
     let loadingState: "initial" | "more" | "refetch" | "ready" = "initial";
     let contacts = [];
+    let unread = [];
     let error = null;
     
+    const sendSocketId = async () => {
+    socket.on("connect", async (data) => {
+      await axios.get(
+        `${apiBaseUrl}/api/users/socket/contacts?access_token=${accessToken}&socket_id=${socket.id}`
+      );
+    });
+    socket.emit("status", { user: accessToken, status: 'online'})
+  };
+
+  const getUnread = async () => {
+    try {
+      const res = await axios.get(`${apiBaseUrl}/api/users/unread?access_token=${accessToken}`)
+      unread = res.data;
+    } catch (err) {
+      console.log(err)
+    }
+  }
     const fetchData = async () => { 
       try {
         const res = await axios.get(`${apiBaseUrl}/api/contacts?access_token=${accessToken}`);
@@ -17,7 +35,10 @@
      }
 
     onMount(async () => {
+      await sendSocketId()
+      await getUnread()
       await fetchData()
+      initSidebar()
     });
 
     window.addEventListener("message", async (event) => {
@@ -75,9 +96,13 @@
   .add-button:hover {
     cursor: pointer;
   }
+  .bold {
+    font-weight: bold;
+  }
 </style>
 
 <main>
+  
   {#if error}
     <p>Error: {error.message}</p>
   {/if}
@@ -88,27 +113,37 @@
     }}"><img class="add-button" src="https://www.downloadclipart.net/large/19773-add-button-white-design.png" alt="add-button"></div>
     </div>
     <br>
+    <div id="contacts-root">
     {#each contacts as contact}
       {#if contact.type == "group"}
-          <div class="contact-card" on:click={() => {
+          <div class="contact-card" id="{contact.conversation_id}-card" on:click={() => {
             tsvscode.postMessage({ type: 'onGroupPress', value: contact });
           }}>
             <div class="inline">
               <img class="contact-img" src="{contact.avatar_url}" alt="{contact.name}"/>
-              <h3 class="contact-name">{contact.name}</h3>
+              {#if unread.includes(contact.conversation_id)}
+              <h3 class="contact-name bold" id="{contact.conversation_id}">{contact.name}</h3>
+              {:else}
+              <h3 class="contact-name" id="{contact.conversation_id}">{contact.name}</h3>
+              {/if}
             </div>
           </div><br>
       {:else}
-          <div class="contact-card" on:click={() => {
+          <div class="contact-card" id="{contact.conversation_id}-card" on:click={() => {
             tsvscode.postMessage({ type: 'onContactPress', value: contact });
           }}>
             <div class="inline">
               <img class="contact-img" src="{contact.avatar_url}" alt="{contact.username}"/>
-              <h3 class="contact-name">{contact.username}</h3>
+              {#if unread.includes(contact.conversation_id)}
+              <h3 class="contact-name bold" id="{contact.conversation_id}">{contact.username}</h3>
+              {:else}
+              <h3 class="contact-name" id="{contact.conversation_id}">{contact.username}</h3>
+              {/if}
             </div>
           </div><br>
       {/if}
     {:else}
       <p>loading..</p>
-	  {/each}
+    {/each}
+  </div>
 </main>

@@ -109,8 +109,24 @@ export class ViewDMPanel {
     this._panel.webview.html = this._getHtmlForWebview(webview);
     webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
+        case "refreshSidebar": {
+          vscode.commands.executeCommand("vscode-dms.refresh");
+          break;
+        }
+        case "sendUnread": {
+          try{
+            await axios.post(`${apiBaseUrl}/api/users/unread?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`)
+          } catch (err) {
+            console.log(err)
+          }
+          break;
+        }
         case "notificationMessage": {
-          vscode.window.showInformationMessage(data.value.sender + ': ' + data.value.message);
+          if (data.value.group) {
+            vscode.window.showInformationMessage(data.value.receiver + ': ' + data.value.sender + ': ' + data.value.message);
+          } else {
+            vscode.window.showInformationMessage(data.value.sender + ': ' + data.value.message);
+          }
           console.log(data.value);
           console.log(data.value.message);
           break;

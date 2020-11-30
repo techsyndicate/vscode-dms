@@ -57,11 +57,18 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
           ViewGroupDMPanel.createOrShow(this._extensionUri, data.value, this.socketID)
           break;
         }
+        case "refresh": {
+          vscode.commands.executeCommand("vscode-dms.refresh")
+          break;
+        }
       }
     });
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
+    const sidebarScriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "media", "sidebar.js")
+    );
     const styleResetUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "media", "reset.css")
     );
@@ -92,11 +99,14 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
         <link href="${styleResetUri}" rel="stylesheet">
 				<link href="${styleVSCodeUri}" rel="stylesheet">
         <link href="${styleMainUri}" rel="stylesheet">
+        <script nonce="${nonce}" src="${apiBaseUrl}/socket.io/socket.io.js"></script>
+        <script nonce="${nonce}" src="${sidebarScriptUri}"></script>
         <script nonce="${nonce}">
             const apiBaseUrl = "${apiBaseUrl}";
             const accessToken = "${Util.getAccessToken()}"
             const user = "${user}"
             const tsvscode = acquireVsCodeApi();
+            const socket = io.connect(apiBaseUrl);
         </script>
 			</head>
       <body>

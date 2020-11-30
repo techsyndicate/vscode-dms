@@ -90,7 +90,13 @@ async function initSocket() {
             }
             window.scrollTo(0, document.body.scrollHeight);
         } else if (msg.sender != clientUsername) {
-            tsvscode.postMessage({ type: 'notificationMessage', value: msg });
+            if (msg.group && msg.receiver != name) {
+                tsvscode.postMessage({ type: 'notificationMessage', value: msg });
+                tsvscode.postMessage({ type: 'sendUnread', value: msg })
+            } else if (!msg.group && msg.receiver != name) {
+                tsvscode.postMessage({ type: 'notificationMessage', value: msg });
+                tsvscode.postMessage({ type: 'sendUnread', value: msg })
+            }
         }
     });
     socket.on("status", status => {

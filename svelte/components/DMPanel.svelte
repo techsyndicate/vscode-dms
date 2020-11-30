@@ -74,6 +74,11 @@
     return messages;
   };
 
+  const read = async () => {
+    await axios.post(`${apiBaseUrl}/api/users/read?access_token=${accessToken}&conversation_id=${message.conversation_id}`)
+    tsvscode.postMessage({type: "refreshSidebar"})
+  }
+
   /**
    * This handler retrieves the images from the clipboard as a base64 string and returns it in a callback.
    *
@@ -200,6 +205,7 @@
     } else {
       message.conversation_id = `${message.receiver}${message.sender}`;
     }
+    await read();
     status = await getStatus();
     finalMessages = await getMessages();
     const messageInputBox = document.getElementById("message-input");
