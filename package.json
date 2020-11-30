@@ -21,6 +21,11 @@
 					"command": "vscode-dms.info",
 					"when": "view == dm-full",
 					"group": "navigation"
+				},
+				{
+					"command": "vscode-dms.settings",
+					"when": "view == dm-full",
+					"group": "navigation"
 				}
 			],
 			"editor/context": [
@@ -38,6 +43,11 @@
 				"command": "vscode-dms.info",
 				"title": "Information",
 				"icon": "media/white-info.svg"
+			},
+			{
+				"command": "vscode-dms.settings",
+				"title": "Settings",
+				"icon": "media/settings.png"
 			}
 		],
 		"viewsContainers": {

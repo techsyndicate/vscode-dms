@@ -5,6 +5,7 @@ import { Util } from "./util"
 import { apiBaseUrl } from './constants'
 const io = require("socket.io-client")
 import axios from 'axios'
+import { accessTokenKey } from './constants'
 
 export async function activate(context: vscode.ExtensionContext) {
 	Util.context = context;
@@ -76,6 +77,90 @@ export async function activate(context: vscode.ExtensionContext) {
 		
 	  <h2>Developed by:</h2>
 	  <p><a style="text-decoration: none;color:white" href="https://github.com/laxyapahuja">Laxya Pahuja</a>, <a style="text-decoration: none;color:white" href="https://github.com/sheldor1510">Anshul Saha</a> and <a style="text-decoration: none;color:white" href="https://github.com/oorjitchowdhary">Oorjit Chowdhary</a></p>
+	  </body>
+	  </html>`;
+	}
+
+	vscode.commands.registerCommand('vscode-dms.settings', async () => {
+		if(!Util.isLoggedIn()) {
+			const choice = await vscode.window.showInformationMessage(
+				`You need to login to GitHub to start messaging, would you like to continue?`,
+				"Yes",
+				"Cancel"
+			);
+			if (choice === "Yes") {
+				authenticate()
+			} 
+		}
+		const panel = vscode.window.createWebviewPanel(
+			'settings',
+			'Settings',
+			vscode.ViewColumn.One,
+			{
+				enableScripts: true
+			}
+		  );
+		panel.webview.html = get2WebviewContent();
+
+		panel.webview.onDidReceiveMessage(
+			async message => {
+			  switch (message.command) {
+				case 'logout':
+				const choice = await vscode.window.showInformationMessage(
+					"Are u sure you want to logout?",
+					"Yes",
+					"Cancel"
+					);
+					if (choice === "Yes") {
+						context.globalState.update(accessTokenKey, undefined).then(() => {console.log(context.globalState.get(accessTokenKey))})
+						vscode.window.showInformationMessage('successfully logged out')
+						vscode.commands.executeCommand("workbench.action.reloadWindow")
+						vscode.commands.executeCommand("vscode-dms.refresh")
+				  		vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+					}
+				  return;
+				case 'clearContactsCache':
+				  vscode.window.showInformationMessage('cleared Contacts Cache')
+				  vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+				  return;  
+			  }
+			},
+			undefined,
+			context.subscriptions
+		);
+	})
+
+	function get2WebviewContent() {
+		return `<!DOCTYPE html>
+	  <html lang="en">
+	  <head>
+		  <meta charset="UTF-8">
+		  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  </head>
+	  <style>
+		button {
+			height: 30px;
+		}
+		button:hover {
+			cursor: pointer;
+		}
+		button:focus {
+			outline: none;
+		}
+	  </style>
+	  <body>
+	  <h1>Settings</h1>		
+	  <button style="width: 150px;background-color:#0066B8;color:white;border: none;" onclick="clearContactsCache()">Clear contacts cache</button><br><br>
+	  <button style="width: 150px;background-color:#0066B8;color:white;border: none;" onclick="logout()">Logout</button>
+	  <script>
+		  const vscode = acquireVsCodeApi();
+		  function logout(){
+			vscode.postMessage({command: 'logout'})
+		  }
+		  function clearContactsCache(){
+			vscode.postMessage({command: 'clearContactsCache'})
+		  }
+	  </script>
 	  </body>
 	  </html>`;
 	}
