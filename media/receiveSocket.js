@@ -93,9 +93,11 @@ async function initSocket() {
             if (msg.group && msg.receiver != name) {
                 tsvscode.postMessage({ type: 'notificationMessage', value: msg });
                 tsvscode.postMessage({ type: 'sendUnread', value: msg })
+                tsvscode.postMessage({type: "refreshSidebar"})
             } else if (!msg.group && msg.receiver != name) {
                 tsvscode.postMessage({ type: 'notificationMessage', value: msg });
                 tsvscode.postMessage({ type: 'sendUnread', value: msg })
+                tsvscode.postMessage({type: "refreshSidebar"})
             }
         }
     });

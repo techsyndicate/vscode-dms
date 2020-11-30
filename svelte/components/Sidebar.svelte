@@ -7,15 +7,6 @@
     let unread = [];
     let error = null;
     
-    const sendSocketId = async () => {
-    socket.on("connect", async (data) => {
-      await axios.get(
-        `${apiBaseUrl}/api/users/socket/contacts?access_token=${accessToken}&socket_id=${socket.id}`
-      );
-    });
-    socket.emit("status", { user: accessToken, status: 'online'})
-  };
-
   const getUnread = async () => {
     try {
       const res = await axios.get(`${apiBaseUrl}/api/users/unread?access_token=${accessToken}`)
@@ -35,10 +26,8 @@
      }
 
     onMount(async () => {
-      await sendSocketId()
       await getUnread()
       await fetchData()
-      initSidebar()
     });
 
     window.addEventListener("message", async (event) => {
@@ -47,6 +36,12 @@
       case "refresh":
         console.log('doing the refreshing..')
         await fetchData();
+        await getUnread()
+        console.log(unread)
+        for(let i=0; i< unread.length; i++) {
+          const contactName = document.getElementById(unread[i])
+          contactName.style.fontWeight = "800"
+        }
         break;
     }
   });
@@ -122,7 +117,7 @@
             <div class="inline">
               <img class="contact-img" src="{contact.avatar_url}" alt="{contact.name}"/>
               {#if unread.includes(contact.conversation_id)}
-              <h3 class="contact-name bold" id="{contact.conversation_id}">{contact.name}</h3>
+                <b><h3 class="contact-name" id="{contact.conversation_id}">{contact.name}</h3></b>
               {:else}
               <h3 class="contact-name" id="{contact.conversation_id}">{contact.name}</h3>
               {/if}
@@ -135,9 +130,9 @@
             <div class="inline">
               <img class="contact-img" src="{contact.avatar_url}" alt="{contact.username}"/>
               {#if unread.includes(contact.conversation_id)}
-              <h3 class="contact-name bold" id="{contact.conversation_id}">{contact.username}</h3>
+                <b><h3 class="contact-name bold" id="{contact.conversation_id}">{contact.username}</h3></b>
               {:else}
-              <h3 class="contact-name" id="{contact.conversation_id}">{contact.username}</h3>
+                <h3 class="contact-name" id="{contact.conversation_id}">{contact.username}</h3>
               {/if}
             </div>
           </div><br>

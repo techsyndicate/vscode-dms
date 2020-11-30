@@ -38,12 +38,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	await sendSocketId()
 
-    socket.on("receive-message", async (msg: { sender: string; message: string; receiver: string; group: boolean }) => {
+    socket.on("receive-message", async (msg: { sender: string; message: string; receiver: string; group: boolean; conversation_id: string }) => {
 		console.log(msg)
 		if (msg.group && msg.sender != loginUser.username) {
 			vscode.window.showInformationMessage(msg.receiver + ': ' + msg.sender + ': '+ msg.message)
+			await axios.post(`${apiBaseUrl}/api/users/unread?access_token=${Util.getAccessToken()}&conversation_id=${msg.conversation_id}`)
+			vscode.commands.executeCommand("vscode-dms.refresh")
         } else if (msg.receiver == loginUser.username) {
 			vscode.window.showInformationMessage(msg.sender + ': '+ msg.message)
+			await axios.post(`${apiBaseUrl}/api/users/unread?access_token=${Util.getAccessToken()}&conversation_id=${msg.conversation_id}`)
+			vscode.commands.executeCommand("vscode-dms.refresh")
         }
     });
 

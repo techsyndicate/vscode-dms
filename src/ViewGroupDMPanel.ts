@@ -130,11 +130,9 @@ export class ViewGroupDMPanel {
           break;
         }
         case "sendUnread": {
-          try{
-            await axios.post(`${apiBaseUrl}/api/users/unread?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`)
-          } catch (err) {
-            console.log(err)
-          }
+          console.log('it has come here')
+          await axios.post(`${apiBaseUrl}/api/users/unread?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`)
+          console.log('awaited')
           break;
         }
         case "delete": {
