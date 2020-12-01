@@ -123,10 +123,6 @@ export async function activate(context: vscode.ExtensionContext) {
 				  		vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 					}
 				  return;
-				case 'clearContactsCache':
-				  vscode.window.showInformationMessage('cleared Contacts Cache')
-				  vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-				  return;  
 			  }
 			},
 			undefined,
@@ -154,15 +150,11 @@ export async function activate(context: vscode.ExtensionContext) {
 	  </style>
 	  <body>
 	  <h1>Settings</h1>		
-	  <button style="width: 150px;background-color:#0066B8;color:white;border: none;" onclick="clearContactsCache()">Clear contacts cache</button><br><br>
 	  <button style="width: 150px;background-color:#0066B8;color:white;border: none;" onclick="logout()">Logout</button>
 	  <script>
 		  const vscode = acquireVsCodeApi();
 		  function logout(){
 			vscode.postMessage({command: 'logout'})
-		  }
-		  function clearContactsCache(){
-			vscode.postMessage({command: 'clearContactsCache'})
 		  }
 	  </script>
 	  </body>
