@@ -115,8 +115,6 @@ export class ViewGroupDMPanel {
           } else {
             vscode.window.showInformationMessage(data.value.sender + ': ' + data.value.message);
           }
-          console.log(data.value);
-          console.log(data.value.message);
           break;
         }
         case "refreshSidebar": {
@@ -125,23 +123,18 @@ export class ViewGroupDMPanel {
         }
         case "close": {
           await axios.get(`${apiBaseUrl}/api/users/socket?access_token=${Util.getAccessToken()}&socket_id=${this._socketID}`);
-          vscode.window.showInformationMessage('You will now recieve notifications while working');
+          vscode.window.showInformationMessage('You will now receive notifications while working.');
           vscode.commands.executeCommand("workbench.action.closeActiveEditor");
           break;
         }
         case "sendUnread": {
-          console.log('it has come here')
-          await axios.post(`${apiBaseUrl}/api/users/unread?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`)
-          console.log('awaited')
+          await axios.post(`${apiBaseUrl}/api/users/unread?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`);
           break;
         }
         case "delete": {
-          console.log(data.value.conversation_id)
-          console.log(data.value.clientUsername)
-          console.log(data.value.adminUsername)
-          if(data.value.clientUsername != data.value.adminUsername) {
+          if (data.value.clientUsername != data.value.adminUsername) {
             vscode.window.showErrorMessage('Only the admin can delete the group');
-            break
+            break;
           }
           else {
             const choice = await vscode.window.showInformationMessage(
@@ -150,14 +143,13 @@ export class ViewGroupDMPanel {
               "Cancel"
             );
             if (choice === "Yes") {
-              const url = `${apiBaseUrl}/api/groups/delete?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`
-              console.log(url)
-              await axios.get(url)
-              vscode.commands.executeCommand("vscode-dms.refresh")
+              const url = `${apiBaseUrl}/api/groups/delete?access_token=${Util.getAccessToken()}&conversation_id=${data.value.conversation_id}`;
+              await axios.get(url);
+              vscode.commands.executeCommand("vscode-dms.refresh");
               vscode.window.showInformationMessage('Successfully deleted');
               vscode.commands.executeCommand("workbench.action.closeActiveEditor");
             } else {
-              break
+              break;
             }
           }
           break;
@@ -167,7 +159,7 @@ export class ViewGroupDMPanel {
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
-    // // And the uri we use to load this script in the webview
+    // Add the uri we use to load this script in the webview
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "out", "compiled/grpdmpanel.js")
     );
@@ -205,14 +197,14 @@ export class ViewGroupDMPanel {
 
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
-    let membersString = ''
-    const membersArray = this._group.members
-    for(let i=0; i< membersArray.length; i++) {
-      if(i == membersArray.length-1) {
-        membersString += `${membersArray[i]}`
+    let membersString = '';
+    const membersArray = this._group.members;
+    for (let i = 0; i < membersArray.length; i++) {
+      if (i == membersArray.length - 1) {
+        membersString += `${membersArray[i]}`;
       }
       else {
-        membersString += `${membersArray[i]}, `
+        membersString += `${membersArray[i]}, `;
       }
     }
 

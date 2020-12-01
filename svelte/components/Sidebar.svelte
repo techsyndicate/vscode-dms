@@ -34,10 +34,8 @@
     const message = event.data;
     switch (message.command) {
       case "refresh":
-        console.log('doing the refreshing..')
         await fetchData();
         await getUnread()
-        console.log(unread)
         for(let i=0; i< unread.length; i++) {
           const contactName = document.getElementById(unread[i])
           contactName.style.fontWeight = "800"

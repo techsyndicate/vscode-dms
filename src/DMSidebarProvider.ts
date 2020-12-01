@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 import { apiBaseUrl } from "./constants";
 import { getNonce } from "./getNonce";
-import { Util } from './util'
+import { Util } from './util';
 import { ViewDMPanel } from "./ViewDMPanel";
-import { createGroupDM } from './createGroupDM'
-import { ViewGroupDMPanel } from './ViewGroupDMPanel'
+import { createGroupDM } from './createGroupDM';
+import { ViewGroupDMPanel } from './ViewGroupDMPanel';
 
 let user:string = '';
 let fileName:string = 'sidebar';
@@ -36,7 +36,7 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
           if (!data.value) {
             return;
           }
-          ViewDMPanel.createOrShow(this._extensionUri, data.value, this.socketID)
+          ViewDMPanel.createOrShow(this._extensionUri, data.value, this.socketID);
           break;
         }
         case "onError": {
@@ -47,18 +47,18 @@ export class DMSidebarProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "onCreateDMPress": {
-          createGroupDM.createOrShow(this._extensionUri)
-          break
+          createGroupDM.createOrShow(this._extensionUri);
+          break;
         }
         case "onGroupPress": {
           if (!data.value) {
             return;
           }
-          ViewGroupDMPanel.createOrShow(this._extensionUri, data.value, this.socketID)
+          ViewGroupDMPanel.createOrShow(this._extensionUri, data.value, this.socketID);
           break;
         }
         case "refresh": {
-          vscode.commands.executeCommand("vscode-dms.refresh")
+          vscode.commands.executeCommand("vscode-dms.refresh");
           break;
         }
       }

@@ -1,3 +1,3 @@
-export const accessTokenKey = "token"
-export const apiBaseUrl = "https://vscdms.tk"
+export const accessTokenKey = "token";
+export const apiBaseUrl = "https://vscdms.tk";
 

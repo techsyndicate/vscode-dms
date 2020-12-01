@@ -1,4 +1,4 @@
-const polka = require('polka')
+const polka = require('polka');
 import * as vscode from "vscode";
 import { accessTokenKey, apiBaseUrl } from "./constants";
 import { Util } from "./util";
@@ -19,7 +19,6 @@ export const authenticate = () => {
       return;
     }
 
-    console.log(token)
     await Util.context.globalState.update(accessTokenKey, token);
 
     res.end(`
@@ -53,7 +52,7 @@ export const authenticate = () => {
 
     (app as any).server.close();
     
-    vscode.commands.executeCommand("workbench.action.reloadWindow")
+    vscode.commands.executeCommand("workbench.action.reloadWindow");
 
     const panel = vscode.window.createWebviewPanel(
       'authSuccessful',

@@ -95,21 +95,18 @@ export class createGroupDM {
     this._panel.webview.html = this._getHtmlForWebview(webview);
     webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
-        case "formSubmission": {  
-          console.log('code reaches here')
+        case "formSubmission": {
           axios.post(`${apiBaseUrl}/api/groups/create?access_token=${Util.getAccessToken()}`, data.value)
-          .then(response => {
-             console.log('code reaches here 2')
-             console.log(response.data)
-             vscode.window.showInformationMessage(`${data.value.name} successfully created`);
-             vscode.commands.executeCommand("vscode-dms.refresh")
-             vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-          })
-          .catch(err => {
-              console.log(err)
-              vscode.window.showErrorMessage(`${err}`)
+            .then(response => {
+              vscode.window.showInformationMessage(`${data.value.name} successfully created`);
+              vscode.commands.executeCommand("vscode-dms.refresh");
               vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-          })
+            })
+            .catch(err => {
+              console.log(err);
+              vscode.window.showErrorMessage(`${err}`);
+              vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+            });
           break;
         }
       }

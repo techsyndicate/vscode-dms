@@ -59,8 +59,6 @@
                     errorP.innerHTML = 'you cannot select more than 4 members'
                 }
                 else {
-                    console.log(nameOfGroup)
-                    console.log(checkedUsers)
                     const formData = {
                         name: nameOfGroup,
                         members: checkedUsers

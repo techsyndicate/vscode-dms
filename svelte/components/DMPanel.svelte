@@ -1,15 +1,12 @@
-<svelte:head>
-  <link href="https://fonts.googleapis.com/css?family=Consolas" rel="stylesheet">
-</svelte:head>
-
 <script lang="ts">
   import { onMount } from "svelte";
   import axios from "axios";
-  import firebase from "firebase";
+  import firebase from "firebase/app";
+  import 'firebase/storage';
   import FormData from "form-data";
 
   let error = null; // shows error in chat
-  let status = ""
+  let status = "";
   let finalMessages = [];
   let date = new Date();
   let message = {
@@ -20,7 +17,7 @@
     type: "text",
     message: "",
     conversation_id: "",
-    group: false
+    group: false,
   };
 
   let firebaseConfig = {
@@ -31,7 +28,7 @@
     storageBucket: firebaseSecrets.env.storageBucket,
     messagingSenderId: firebaseSecrets.env.messagingSenderId,
     appId: firebaseSecrets.env.appId,
-  }
+  };
 
   firebase.initializeApp(firebaseConfig);
 
@@ -41,7 +38,7 @@
         `${apiBaseUrl}/api/users/socket?access_token=${accessToken}&socket_id=${socket.id}`
       );
     });
-    socket.emit("status", { user: accessToken, status: 'online'})
+    socket.emit("status", { user: accessToken, status: "online" });
   };
 
   const getStatus = async () => {
@@ -64,20 +61,26 @@
     );
     const messages = res.data;
     for (let i = 0; i < messages.length; i++) {
-        if(messages[i].type == "code") {
-           const initialMessage = messages[i].message
-           const newMessage = initialMessage.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"')
-           console.log(newMessage)
-           messages[i].message = newMessage
-        }
+      if (messages[i].type == "code") {
+        const initialMessage = messages[i].message;
+        const newMessage = initialMessage
+          .replace(/\\n/g, "<br/>")
+          .replace(/\\r/g, "")
+          .replace(/\\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
+          .replace(/\\'/g, "'")
+          .replace(/\\"/g, '"');
+        messages[i].message = newMessage;
+      }
     }
     return messages;
   };
 
   const read = async () => {
-    await axios.post(`${apiBaseUrl}/api/users/read?access_token=${accessToken}&conversation_id=${message.conversation_id}`)
-    tsvscode.postMessage({type: "refreshSidebar"})
-  }
+    await axios.post(
+      `${apiBaseUrl}/api/users/read?access_token=${accessToken}&conversation_id=${message.conversation_id}`
+    );
+    tsvscode.postMessage({ type: "refreshSidebar" });
+  };
 
   /**
    * This handler retrieves the images from the clipboard as a base64 string and returns it in a callback.
@@ -149,7 +152,8 @@
         function (imageDataBase64) {
           if (imageDataBase64) {
             // assigns randomly generated string for image name
-            const fileName = (length = 12) => Math.random().toString(20).substr(2, length);
+            const fileName = (length = 12) =>
+              Math.random().toString(20).substr(2, length);
             const firebaseStorage = firebase.storage().ref().child(fileName());
 
             const uploadTask = firebaseStorage.putString(
@@ -165,7 +169,6 @@
               () => {
                 uploadTask.snapshot.ref.getDownloadURL().then((downloadUrl) => {
                   imageUrl = downloadUrl;
-                  console.log(`File uploaded at: ${downloadUrl}.`);
 
                   // need to take that url and pass it as the message property of the message object
                   message.message = imageUrl;
@@ -219,12 +222,12 @@
   }
 
   function isUrl(s) {
-   var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-   return regexp.test(s);
+    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    return regexp.test(s);
   }
 
   function isImageUrl(url) {
-    return(url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+    return url.match(/\.(jpeg|jpg|gif|png)$/) != null;
   }
 
   function messageInflator(message) {
@@ -250,6 +253,11 @@
   }
 </script>
 
+<svelte:head>
+  <link
+    href="https://fonts.googleapis.com/css?family=Consolas"
+    rel="stylesheet" />
+</svelte:head>
 <main>
   <div class="navbar">
     <div class="navbar-inline">
@@ -335,12 +343,18 @@
           <div class="msg-container">
             {#if isUrl(message.message)}
               {#if isImageUrl(message.message)}
-                  <a href={message.message} style="text-decoration: none"><img class="image-content" src="{message.message}" alt="{message.sender}"></a>
+                <a href={message.message} style="text-decoration: none"><img
+                    class="image-content"
+                    src={message.message}
+                    alt={message.sender} /></a>
               {:else}
-                  <a href={message.message} style="text-decoration: none"><h4 class="msg-content">{message.message}</h4></a>
+                <a href={message.message} style="text-decoration: none"><h4
+                    class="msg-content">
+                    {message.message}
+                  </h4></a>
               {/if}
-              {:else}
-                 <h4 class="msg-content">{message.message}</h4>
+            {:else}
+              <h4 class="msg-content">{message.message}</h4>
             {/if}
           </div>
         </div><br />
@@ -408,14 +422,14 @@
             message.date = date;
             message.type = 'text';
             socket.emit('send-message', JSON.stringify(message));
-            const loadingText = document.getElementById('loading')
-            if(loadingText != null) {
-              loadingText.innerHTML = ''
+            const loadingText = document.getElementById('loading');
+            if (loadingText != null) {
+              loadingText.innerHTML = '';
             }
             const messagesArea = document.getElementById('messages-area');
             messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(message);
             document.sendMessage.reset();
-            tsvscode.postMessage({type: "refreshSidebar"})
+            tsvscode.postMessage({ type: 'refreshSidebar' });
             window.scrollTo(0, document.body.scrollHeight);
           }
         }}>

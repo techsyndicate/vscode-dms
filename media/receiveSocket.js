@@ -1,7 +1,8 @@
+/* eslint-disable no-throw-literal */
 async function initSocket() {
-    console.log('socket initialized')
-    const messagesArea = document.getElementById('messages-area')
-    const Status = document.getElementById('dm-status')
+    console.log('Socket initialized');
+    const messagesArea = document.getElementById('messages-area');
+    const Status = document.getElementById('dm-status');
 
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -9,27 +10,26 @@ async function initSocket() {
 
     while (true) {
         try {
-            let msg = document.getElementsByClassName('msg')
+            let msg = document.getElementsByClassName('msg');
             if (msg.length == 0) {
-                throw "empty array"
+                throw "empty array";
             } else {
                 window.scrollTo(0, document.body.scrollHeight);
-                console.log('success')
-                break
+                console.log('success');
+                break;
             }
         } catch (err) {
-            console.log(err)
-            console.log('error')
-            await sleep(500)
+            console.log(err);
+            await sleep(500);
         }
     }
 
     function dateToString(date) {
-        return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+        return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     }
 
     function isUrl(s) {
-        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
         return regexp.test(s);
     }
 
@@ -39,7 +39,7 @@ async function initSocket() {
 
     function messageInflator(message) {
         date = dateToString(new Date(message.date));
-        message.message = message.message.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"')
+        message.message = message.message.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"');
         if (isUrl(message.message)) {
             if (isImageUrl(message.message)) {
                 // render the image
@@ -55,19 +55,18 @@ async function initSocket() {
     }
 
     function imageInflator(message) {
-        date = dateToString(new Date(message.date))
+        date = dateToString(new Date(message.date));
         return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><a href="${message.message}"><img class="image-content" src="${message.message}"></a></div><br>`;
     }
 
     function codeInflator(message) {
-        date = dateToString(new Date(message.date))
-        message.message = message.message.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"')
+        date = dateToString(new Date(message.date));
+        message.message = message.message.replace(/\\n/g, '<br/>').replace(/\\r/g, '').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\\'/g, "\'").replace(/\\"/g, '\"');
         return `<div class="msg"><div class="message-inline"><img src="https://github.com/${message.sender}.png" alt=${message.sender} class="msg-img"><h3 class="dm-name">${message.sender}<span class="date">${date}</span> </h3></div><div class="code">${message.message}</div></div><br>`;
     }
 
     socket.on("receive-message", msg => {
         if (msg.group && msg.receiver == name && msg.sender != clientUsername) {
-            console.log(msg.sender, clientUsername, msg.message)
             if (msg.type == "text") {
                 messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(msg);
             }
@@ -92,19 +91,19 @@ async function initSocket() {
         } else if (msg.sender != clientUsername) {
             if (msg.group && msg.receiver != name) {
                 tsvscode.postMessage({ type: 'notificationMessage', value: msg });
-                tsvscode.postMessage({ type: 'sendUnread', value: msg })
-                tsvscode.postMessage({type: "refreshSidebar"})
+                tsvscode.postMessage({ type: 'sendUnread', value: msg });
+                tsvscode.postMessage({type: "refreshSidebar"});
             } else if (!msg.group && msg.receiver != name) {
                 tsvscode.postMessage({ type: 'notificationMessage', value: msg });
-                tsvscode.postMessage({ type: 'sendUnread', value: msg })
-                tsvscode.postMessage({type: "refreshSidebar"})
+                tsvscode.postMessage({ type: 'sendUnread', value: msg });
+                tsvscode.postMessage({type: "refreshSidebar"});
             }
         }
     });
     socket.on("status", status => {
-        console.log(status)
+        console.log(status);
         if (status.user == username) {
-            Status.innerHTML = status.status
+            Status.innerHTML = status.status;
         }
-    })
+    });
 }
