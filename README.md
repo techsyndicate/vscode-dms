@@ -10,16 +10,18 @@ Follow up on the realtime chat demo videos [here](https://bhyi.tk/vscdms-demo-us
 
 ## Features
 
-* Quickly sign-in through your GitHub account to get started.
-* The extension fetches all your mutual contacts from GitHub to whom you can message right away.
-* Know when your friends are online by simply checking their status.
-* Share screenshots of bugs, features, or anything you wish by pasting the image in the chatbox.
-* Share code snippets to your most recent conversation in one click.<br/><br/>
-<img src="https://cdn.discordapp.com/attachments/767769692001402910/783423730247401503/unknown.png"/>
-* Create Group DMs (max 5 people) to collaborate and work in sync together on a project.
-* Customize your notification settings by clicking on the notification icon of respective chats.
+- Quickly sign-in through your GitHub account to get started.
+- The extension fetches all your mutual contacts from GitHub to whom you can message right away.
+- Know when your friends are online by simply checking their status.
+- Share screenshots of bugs, features, or anything you wish by pasting the image in the chatbox.
+- Share code snippets to your most recent conversation in one click.<br/><br/>
+  <img src="https://cdn.discordapp.com/attachments/767769692001402910/783423730247401503/unknown.png"/>
+
+- Create Group DMs (max 5 people) to collaborate and work in sync together on a project.
+- Customize your notification settings by clicking on the notification icon of respective chats.
 
 ### Media
+
 A complete gallery of all the working processes of the extension can be found [here](https://imgur.com/a/oJTM9L2).
 
 ## Getting Started
@@ -27,7 +29,7 @@ A complete gallery of all the working processes of the extension can be found [h
 1. Install the extension from [here](https://marketplace.visualstudio.com/items?itemName=techsyndicate.vscode-dms) or search it on the VS Code marketplace.
 2. Once you have it, you'll need to login through GitHub to start messaging.
 3. On completing the authentication, you can click on the Direct Messages icon on the sidebar, and it will load all of your mutual contacts from GitHub.<br/><br/>
-<img src="https://cdn.discordapp.com/attachments/767769692001402910/783412839854637066/unknown.png">
+   <img src="https://cdn.discordapp.com/attachments/767769692001402910/783412839854637066/unknown.png">
 
 4. And that's it. You're now ready to start messaging!
 
