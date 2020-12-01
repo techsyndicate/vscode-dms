@@ -111,7 +111,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			  switch (message.command) {
 				case 'logout':
 				const choice = await vscode.window.showInformationMessage(
-					"Are u sure you want to logout?",
+					"Are you sure you want to logout?",
 					"Yes",
 					"Cancel"
 					);

@@ -145,7 +145,7 @@ export class ViewGroupDMPanel {
           }
           else {
             const choice = await vscode.window.showInformationMessage(
-              "Are u sure you want to delete the group?",
+              "Are you sure you want to delete the group?",
               "Yes",
               "Cancel"
             );

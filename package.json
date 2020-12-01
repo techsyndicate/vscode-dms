@@ -1,7 +1,11 @@
 {
 	"name": "vscode-dms",
-	"displayName": "VSCode DMs",
-	"description": "Direct Messages for Visual Studio Code",
+	"displayName": "Direct Messages",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/techsyndicate/vscode-dms"
+	},
+	"description": "Direct Messages for VSCode",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.51.0"

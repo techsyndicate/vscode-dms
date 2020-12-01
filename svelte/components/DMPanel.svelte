@@ -415,6 +415,7 @@
             const messagesArea = document.getElementById('messages-area');
             messagesArea.innerHTML = messagesArea.innerHTML + messageInflator(message);
             document.sendMessage.reset();
+            tsvscode.postMessage({type: "refreshSidebar"})
             window.scrollTo(0, document.body.scrollHeight);
           }
         }}>
